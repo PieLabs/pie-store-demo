@@ -1,0 +1,59 @@
+{
+  "name": "pie-store-demo",
+  "version": "0.0.0-prerelease",
+  "description": "a webapp that uses pie content with persisted items and sessions",
+  "preferGlobal": false,
+  "private": true,
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/gulp test",
+    "build": "gulp build",
+    "it": "./node_modules/.bin/gulp it",
+    "dev": "export NODE_ENV=dev && ./node_modules/.bin/nodemon --watch 'src/**/*.ts' --exec './node_modules/.bin/ts-node' src/index.ts --logConfig='info'",
+    "release": "./node_modules/.bin/gulp release",
+    "source-maps": "gulp build && ./node_modules/.bin/tsc"
+  },
+  "repository": "PieLabs/pie-store-demo",
+  "engines": {
+    "node": ">=7.2.0",
+    "npm": ">=3.10.7"
+  },
+  "keywords": [
+    "pie",
+    "demo"
+  ],
+  "author": "info@corespring.org",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PieLabs/pie-catalog/issues"
+  },
+  "homepage": "https://github.com/PieLabs/pie-store-demo",
+  "devDependencies": {
+    "@types/express": "^4.0.35",
+    "@types/minimist": "^1.2.0",
+    "@types/mongodb": "^2.1.41",
+    "@types/webpack": "^2.2.14",
+    "@types/webpack-dev-middleware": "^1.9.1",
+    "compression-webpack-plugin": "^0.3.2",
+    "fs-extra": "^2.1.2",
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^4.2.0",
+    "gulp-typescript": "^3.1.6",
+    "mocha": "^3.2.0",
+    "nodemon": "^1.11.0",
+    "release-helper": "github:pielabs/release-helper",
+    "run-sequence": "^1.2.2",
+    "ts-node": "^3.0.2",
+    "typescript": "^2.2.2",
+    "webpack": "^2.3.2",
+    "webpack-dev-middleware": "^1.10.1"
+  },
+  "dependencies": {
+    "express": "^4.15.2",
+    "log-factory": "^1.0.1",
+    "minimist": "^1.2.0",
+    "mongodb": "^2.2.25",
+    "pug": "^2.0.0-beta11",
+    "pie-catalog-client": "PieLabs/pie-catalog-client#v0.6.1"
+  }
+}
