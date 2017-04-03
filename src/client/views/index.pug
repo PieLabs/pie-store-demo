@@ -4,6 +4,12 @@ html
     title pie-demo-store 
     link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
 
+    script.
+    
+       window._pieStore = {};
+       window._pieStore.items = !{ items ? JSON.stringify(items) : []};
+       console.log('items; ', window._pieStore.items);
+
   body
     catalog-container 
       span(slot="header") Pie Demo Store

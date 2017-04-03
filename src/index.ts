@@ -9,27 +9,27 @@ import { ObjectID } from 'mongodb';
 import api from './api';
 import client from './client';
 import { join } from 'path';
+import { stringToObjectID } from "./services/utils";
 
 var argv = require('minimist')(process.argv.slice(2));
 
 let raw = process.argv.slice(2);
 let args: any = minimist(raw);
 let logConfig = process.env['LOG_CONFIG'] || args.logConfig || 'info';
-
+console.log('logconfig: ', logConfig);
 init({
   console: true,
   log: logConfig
 });
 
 const logger = getLogger('APP');
-logger.silly('argv: ', argv);
 
 process.on('unhandledRejection', (reason, p: Promise<any>) => {
   logger.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
   // application specific logging, throwing an error, or other logic here
 });
 
-let opts = buildOpts(args, process.env); 
+let opts = buildOpts(args, process.env);
 
 bootstrap(opts)
   .then((services) => {
@@ -37,8 +37,8 @@ bootstrap(opts)
 
     const { NODE_ENV } = process.env;
     const env = NODE_ENV === 'production' || NODE_ENV === 'prod' ? 'prod' : 'dev';
-    
-    app.use('/', client(services.items, env));
+
+    app.use('/', client(services.items, services.sessions, env, stringToObjectID));
     app.use('/api', api(services.items));
 
     const server = http.createServer(app);

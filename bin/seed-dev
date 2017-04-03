@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+
+const mongo = require('mongodb');
+const { readJsonSync } = require('fs-extra');
+
+const minimist = require('minimist');
+const { resolve } = require('path');
+
+const args = minimist(process.argv.slice(0, 2));
+
+console.log(args);
+const uri = args.uri || process.env.MONGO_URI || 'mongodb://localhost:27017/pie-store-demo';
+
+const readItems = (paths) => paths.map(p => readJsonSync(resolve(__dirname, p)));
+
+const items = readItems([
+  '../seed/dev/items/one.json',
+]);
+
+const seedItems = (c) => {
+  console.log(c);
+
+  return Promise.all(items.map(i => {
+    return c.insert(i)
+      .then(() => {
+        console.log('inserted: ', i);
+      });
+  }));
+};
+
+mongo.MongoClient.connect(uri)
+  .then((client) => {
+    console.log(client.databaseName)
+    const db = client.db(client.databaseName);
+    console.log('db: ', db);
+    const collection = db.collection('items');
+    console.log('collection: ', collection);
+    return collection.remove({})
+      .then(() => collection);
+  })
+  .then(seedItems)
+  .then(() => {
+    process.exit(0);
+  })
+  .catch(e => {
+    console.error(e)
+    process.exit(1);
+  });

@@ -1,0 +1,20 @@
+doctype html 
+html 
+  head
+    title pie-demo-store 
+    link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
+
+    script.
+    
+       window._pieStore = {};
+       window._pieStore.item = !{ item ? JSON.stringify(item) : {}};
+       window._pieStore.endpoints = !{endpoints ? JSON.stringify(endpoints) : {}}; 
+       console.log('item; ', window._pieStore.item);
+       console.log('endpoints; ', window._pieStore.endpoints);
+
+  body
+    catalog-container 
+      span(slot="header") Pie Demo Store
+      item-info
+
+    script(src="/item.js")

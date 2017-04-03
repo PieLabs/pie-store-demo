@@ -1,5 +1,5 @@
 import { Db, MongoClient, ObjectID } from 'mongodb';
-import { ItemService, MongoItemService } from './services/items';
+import { ItemService, MongoItemService, MongoSessionService, SessionService } from './services';
 
 import { buildLogger } from 'log-factory';
 import { join } from 'path';
@@ -7,7 +7,8 @@ import { join } from 'path';
 const logger = buildLogger();
 
 export type Services<ID> = {
-  items: ItemService<ID>
+  items: ItemService<ID>,
+  sessions: SessionService<ID>
 }
 
 export type BootstrapOpts = {
@@ -20,9 +21,9 @@ export type BootstrapOpts = {
 
 export async function bootstrap(opts: BootstrapOpts): Promise<Services<ObjectID>> {
   const db = await MongoClient.connect(opts.mongoUri);
-  const collection = db.collection('items');
-  const items : ItemService<ObjectID> = new MongoItemService(collection);
-  return { items }; 
+  const items: ItemService<ObjectID> = new MongoItemService(db.collection('items'));
+  const sessions: SessionService<ObjectID> = new MongoSessionService(db.collection('sessions'));
+  return { items, sessions };
 }
 
 export function buildOpts(args: any, env: any): BootstrapOpts {
