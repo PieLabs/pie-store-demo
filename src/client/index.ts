@@ -4,10 +4,12 @@ import * as webpack from 'webpack';
 import * as webpackMiddleware from 'webpack-dev-middleware';
 
 import { ItemService, SessionService } from '../services';
+import { createReadStream, stat } from 'fs-extra';
 import { join, resolve } from 'path';
 
 import { ObjectID } from 'mongodb';
 import { buildLogger } from 'log-factory';
+import { parseId } from './../middleware';
 
 const logger = buildLogger();
 
@@ -40,6 +42,9 @@ export default function <ID>(
     app.use(express.static(dir));
   }
 
+
+  const parse = parseId.bind(null, stringToId);
+
   app.get('/', (req, res, next) => {
     itemService.list({})
       .then(items => {
@@ -68,7 +73,7 @@ export default function <ID>(
           },
           session: {
             create: {
-              url: `/api/sessions/:itemId`,
+              url: `/api/sessions/item/:itemId`,
               method: 'POST'
             },
             delete: {
@@ -76,7 +81,7 @@ export default function <ID>(
               url: `/api/sessions/:sessionId`
             },
             list: {
-              url: `/api/sessions/:itemId`,
+              url: `/api/sessions/item/:itemId`,
               method: 'GET'
             }
           }
@@ -95,6 +100,51 @@ export default function <ID>(
       })
       .catch(next);
   });
+
+  app.get('/player/:sessionId',
+    parse.bind(null, 'sessionId'),
+    (req: any, res, next) => {
+      logger.silly('sessionId:', req.sessionId);
+
+
+      const endpoints = {
+        controller: {
+          model: {
+            method: 'POST',
+            url: `/api/sessions/${req.sessionId}/player/model`
+          }
+        }
+      }
+      sessionService.findById(req.sessionId)
+        .then((session: any) => {
+          itemService.findById(session.itemId)
+            .then((item: any) => {
+              logger.silly('session: ', JSON.stringify(session));
+              res.render('player', {
+                session,
+                endpoints,
+                markup: item.markup,
+                js: [`/player/${session.itemId}/pie-view.js`]
+              });
+            });
+        })
+        .catch(next);
+    });
+
+  app.get('/player/:itemId/pie-view.js',
+    parse.bind(null, 'itemId'),
+    (req: any, res, next) => {
+      itemService.findById(req.itemId)
+        .then((item: any) => {
+          stat(item.paths.view, (e, s) => {
+            const rs = createReadStream(item.paths.view);
+            res.setHeader('Content-Type', 'application/javascript');
+            res.setHeader('Content-Length', s.size.toString());
+            rs.pipe(res);
+          })
+        })
+        .catch(next);
+    });
 
   return app;
 }

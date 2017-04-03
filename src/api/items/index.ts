@@ -1,10 +1,11 @@
 import * as express from 'express';
 
-import { ItemService, MongoItemService } from '../../services/items';
+import { ItemService } from '../../services';
 
-export { ItemService, MongoItemService };
-
-export default function <ID> (service: ItemService<ID>) : express.Application {
+export default function <ID>(
+  service: ItemService<ID>,
+  stringToId: (string) => ID): express.Application {
   const app = express();
+
   return app;
 }

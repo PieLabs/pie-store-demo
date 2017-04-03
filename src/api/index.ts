@@ -1,8 +1,15 @@
 import * as express from 'express';
 
-import { ItemService } from '../services/items';
+import { ItemService, SessionService } from '../services';
 
-export default function <ID> (items: ItemService<ID>) : express.Application {
+import mkSessions from './sessions';
+
+export default function <ID>(
+  itemService: ItemService<ID>,
+  sessionService: SessionService<ID>,
+  stringToId: (string) => ID): express.Application {
   const api = express();
+  const sessions = mkSessions(sessionService, itemService, stringToId);
+  api.use('/sessions', sessions);
   return api;
 }

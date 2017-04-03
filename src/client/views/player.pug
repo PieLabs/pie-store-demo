@@ -1,0 +1,22 @@
+doctype html 
+html 
+  head
+    title pie-demo-store 
+    link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
+
+
+    script.
+       window._pieStore = {};
+       window._pieStore.session = !{ session ? JSON.stringify(session) : {}};
+       window._pieStore.endpoints = !{ endpoints ? JSON.stringify(endpoints) : {}};
+
+  body
+    catalog-container 
+      span(slot="header") Pie Demo Store
+      h1 pie player
+      pie-player
+        | !{markup}  
+
+    script(src="/player.js")
+    for j in js 
+      script(src=j, type="text/javascript")

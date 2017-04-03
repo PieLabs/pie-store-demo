@@ -7,6 +7,7 @@ module.exports = {
   entry: {
     index: './src/index.js',
     item: './src/item.js',
+    player: './src/player.js',
   },
   output: {
     publicPath: '/',

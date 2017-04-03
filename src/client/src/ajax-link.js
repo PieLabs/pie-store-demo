@@ -9,7 +9,8 @@ export class AjaxResultEvent extends CustomEvent {
   constructor(method, url, data) {
     super(AjaxResultEvent.TYPE(), {
       bubbles: true,
-      details: {
+      composed: true,
+      detail: {
         method,
         url,
         data
@@ -27,7 +28,8 @@ export class AjaxFailedEvent extends CustomEvent {
   constructor(method, url, error) {
     super(AjaxFailedEvent.TYPE(), {
       bubbles: true,
-      details: {
+      composed: true,
+      detail: {
         method,
         url,
         error
@@ -40,9 +42,10 @@ const html = `
 <style>
 :host {
   cursor: pointer;
+  display: inline;
 }
 </style>
-<div id="label">label</div>`;
+<span id="label">label</span>`;
 
 const template = prepareTemplate(html, 'item-info');
 
@@ -60,10 +63,7 @@ export default class AjaxLink extends HTMLElement {
     const url = this.getAttribute('url');
 
     this.addEventListener('click', (e) => {
-      fetch({
-        method,
-        url
-      })
+      fetch(url, { method, body: {} })
         .then(r => r.json())
         .then(j => {
           this.dispatchEvent(new AjaxResultEvent(method, url, j))

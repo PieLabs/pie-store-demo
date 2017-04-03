@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "corespring-choice-controller": "/mnt/biggie-one/dev/github/PieLabs/pie-store-demo/seed/dev/items/one/.pie/node_modules/corespring-choice/controller"
+  },
+  "devDependencies": {},
+  "name": "controllers",
+  "private": true,
+  "version": "0.0.1"
+}

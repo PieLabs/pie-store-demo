@@ -1,0 +1,1 @@
+exports['corespring-choice'] = require('corespring-choice-controller');

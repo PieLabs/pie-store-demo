@@ -29,7 +29,9 @@
   },
   "homepage": "https://github.com/PieLabs/pie-store-demo",
   "devDependencies": {
+    "@types/body-parser": "^1.16.3",
     "@types/express": "^4.0.35",
+    "@types/fs-extra": "^2.0.0",
     "@types/minimist": "^1.2.0",
     "@types/mongodb": "^2.1.41",
     "@types/webpack": "^2.2.14",
@@ -49,11 +51,13 @@
     "webpack-dev-middleware": "^1.10.1"
   },
   "dependencies": {
+    "body-parser": "^1.17.1",
     "express": "^4.15.2",
     "log-factory": "^1.0.1",
     "minimist": "^1.2.0",
     "mongodb": "^2.2.25",
-    "pug": "^2.0.0-beta11",
-    "pie-catalog-client": "PieLabs/pie-catalog-client#v0.6.1"
+    "pie-catalog-client": "PieLabs/pie-catalog-client#v0.6.1",
+    "pie-player": "github:pielabs/pie-player",
+    "pug": "^2.0.0-beta11"
   }
 }

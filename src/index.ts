@@ -39,7 +39,7 @@ bootstrap(opts)
     const env = NODE_ENV === 'production' || NODE_ENV === 'prod' ? 'prod' : 'dev';
 
     app.use('/', client(services.items, services.sessions, env, stringToObjectID));
-    app.use('/api', api(services.items));
+    app.use('/api', api(services.items, services.sessions, stringToObjectID));
 
     const server = http.createServer(app);
 

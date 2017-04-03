@@ -1,25 +1,35 @@
 #!/usr/bin/env node
+const _ = require('lodash');
 
 const mongo = require('mongodb');
-const { readJsonSync } = require('fs-extra');
+const { readJsonSync, readFileSync } = require('fs-extra');
 
 const minimist = require('minimist');
-const { resolve } = require('path');
+const { join, resolve } = require('path');
 
 const args = minimist(process.argv.slice(0, 2));
 
 console.log(args);
 const uri = args.uri || process.env.MONGO_URI || 'mongodb://localhost:27017/pie-store-demo';
 
-const readItems = (paths) => paths.map(p => readJsonSync(resolve(__dirname, p)));
+const readItem = (dir) => {
+  const config = readJsonSync(join(dir, 'config.json'));
+  const markup = readFileSync(join(dir, 'index.html'));
+  const paths = {
+    controllers: resolve(join(dir, 'pie-controllers.js')),
+    view: resolve(join(dir, 'pie-view.js'))
+  }
+
+  return _.merge({}, config, { markup, paths });
+}
+
+const readItems = (paths) => paths.map(p => readItem(resolve(__dirname, p)));
 
 const items = readItems([
-  '../seed/dev/items/one.json',
+  '../seed/dev/items/one',
 ]);
 
 const seedItems = (c) => {
-  console.log(c);
-
   return Promise.all(items.map(i => {
     return c.insert(i)
       .then(() => {
@@ -35,7 +45,8 @@ mongo.MongoClient.connect(uri)
     console.log('db: ', db);
     const collection = db.collection('items');
     console.log('collection: ', collection);
-    return collection.remove({})
+    return db.collection('sessions').remove({})
+      .then(() => collection.remove({}))
       .then(() => collection);
   })
   .then(seedItems)
