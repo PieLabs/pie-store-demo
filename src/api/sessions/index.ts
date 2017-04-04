@@ -13,10 +13,9 @@ export default function <ID>(
   sessionService: SessionService<ID>,
   itemService: ItemService<ID>,
   stringToId: (string) => ID): express.Application {
+
   const app = express();
-
   app.use(json());
-
 
   const parse = parseId.bind(null, stringToId);
 
@@ -51,12 +50,16 @@ export default function <ID>(
       const { session, env } = req.body;
 
       logger.silly('sessionId: ', req.sessionId);
+      logger.silly('session: ', JSON.stringify(session));
+      logger.silly('env: ', JSON.stringify(env));
+
       sessionService.findById(req.sessionId)
         .then((s: any) => {
           return itemService.findById(s.itemId);
         })
         .then((i: any) => {
-          const controllerMap = require(i.paths.controller);
+          logger.silly('paths: ', i.paths);
+          const controllerMap = require(i.paths.controllers);
           const controller = new Controller(i, controllerMap);
           return controller.model(session, env);
         })

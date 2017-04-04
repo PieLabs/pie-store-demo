@@ -49,6 +49,13 @@ gulp.task('default', ['build']);
 
 gulp.task('build', done => runSequence('clean', ['pug', 'ts'], done));
 
+gulp.task('copy-client-js', () => {
+  return gulp.src('src/client/**/*.js')
+    .pipe(gulp.dest('lib/client/'));
+});
+
+gulp.task('client', ['copy-client-js']);
+
 gulp.task('dev', ['build', 'watch-pug', 'watch-ts']);
 
 gulp.task('test', ['unit']);

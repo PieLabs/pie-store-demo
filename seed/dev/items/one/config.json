@@ -5,7 +5,7 @@
     "zh-CN"
   ],
   "elements": {
-    "corespring-choice": "^1.7.0"
+    "corespring-choice": "2.0.0-prerelease"
   },
   "models": [
     {

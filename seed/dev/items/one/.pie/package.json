@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "corespring-choice": "^1.7.0"
-  },
-  "devDependencies": {},
-  "name": "pie-root-install",
-  "private": true,
-  "version": "0.0.1"
-}
