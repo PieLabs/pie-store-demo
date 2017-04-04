@@ -14,10 +14,10 @@ const mongo = require('mongodb');
 const { readJsonSync, readFileSync, existsSync } = require('fs-extra');
 
 const minimist = require('minimist');
-const { join, resolve, basename } = require('path');
+const { join, resolve, basename, dirname } = require('path');
 const { exec } = require('child_process');
 
-const args = minimist(process.argv.slice(0, 2));
+const args = minimist(process.argv.slice(2));
 
 console.log(args);
 
@@ -25,7 +25,7 @@ const uri = args.uri || process.env.MONGO_URI || 'mongodb://localhost:27017/pie-
 
 const readItemInfo = (dir) => {
   const config = readJsonSync(join(dir, 'config.json'));
-  const markup = readFileSync(join(dir, 'index.html'));
+  const markup = readFileSync(join(dir, 'index.html'), 'utf8');
   const paths = {
     controllers: join(basename(dir), 'pie-controllers.js'),
     view: join(basename(dir), 'pie-view.js')
@@ -38,10 +38,15 @@ const copyPathToS3 = (bucket, prefix, path, cwd) => {
   console.log('copyPathToS3, bucket: ', bucket, 'prefix: ', prefix);
 
   return new Promise((resolve, reject) => {
-    exec(`aws s3 cp ${path} s3://${bucket}/${prefix}/built-pies/${path}`, { cwd }, (err) => {
+
+    const dir = basename(cwd);
+    const cmd = `aws s3 cp ${path} s3://${bucket}/${prefix}/built-pies/${dir}/${path}`;
+    console.log('[copyPathToS3] cmd: ', cmd);
+    exec(cmd, { cwd }, (err, stdout, stderr) => {
       if (err) {
         reject(err);
       } else {
+        console.log(stdout);
         resolve();
       }
     });
@@ -61,13 +66,14 @@ const maybePackPies = (cwd) => {
       existsSync(join(cwd, 'pie-controllers.js')) &&
       existsSync(join(cwd, 'pie-view.js'))) {
       console.log('skip packing - assets exist');
-      resolve();
+      res();
     } else {
       exec('pie pack', { cwd }, (err, stdout, stderr) => {
         if (err) {
           reject(err);
         } else {
-          res(info);
+          console.log(stdout);
+          res();
         }
       });
     }
@@ -75,6 +81,8 @@ const maybePackPies = (cwd) => {
 }
 
 const maybeCopyToS3 = (cwd) => {
+  console.log('maybeCopyToS3, cwd: ', cwd);
+
   const { bucket, prefix } = args;
   if (bucket && prefix) {
     return copyPathsToS3(bucket, prefix, cwd);
@@ -84,9 +92,16 @@ const maybeCopyToS3 = (cwd) => {
 }
 
 const buildAndRead = (cwd) => {
+
+  console.log('[buildAndRead] cwd: ', cwd);
   return maybePackPies(cwd)
+    .then(() => {
+      console.log('next');
+      return null;
+    })
     .then(() => maybeCopyToS3(cwd))
     .then(() => readItemInfo(cwd))
+    .catch(e => console.error(e));
 }
 
 const buildAndReadItems = (paths) => paths.map(p => buildAndRead(resolve(__dirname, p)));
@@ -99,6 +114,8 @@ const builtItems = buildAndReadItems([
 Promise.all(builtItems)
   .then(items => {
 
+    console.log('items: ', items);
+
     const seedItems = (c) => {
       return Promise.all(items.map(i => {
         return c.insert(i)
@@ -110,11 +127,9 @@ Promise.all(builtItems)
 
     mongo.MongoClient.connect(uri)
       .then((client) => {
-        console.log(client.databaseName)
+        console.log('databaseName: ', client.databaseName);
         const db = client.db(client.databaseName);
-        console.log('db: ', db);
         const collection = db.collection('items');
-        console.log('collection: ', collection);
         return db.collection('sessions').remove({})
           .then(() => collection.remove({}))
           .then(() => collection);
