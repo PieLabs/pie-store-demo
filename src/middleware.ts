@@ -1,7 +1,7 @@
 import { buildLogger } from 'log-factory';
 const logger = buildLogger();
 
-export const parseId = <ID>(stringToId: (string) => ID,
+export const parseId = <ID>(stringToId: (id: string) => ID,
   key: string, req, res, next) => {
 
   logger.debug('key: ', key);

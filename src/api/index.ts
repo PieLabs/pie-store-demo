@@ -7,7 +7,7 @@ import mkSessions from './sessions';
 export default function <ID>(
   itemService: ItemService<ID>,
   sessionService: SessionService<ID>,
-  stringToId: (string) => ID): express.Application {
+  stringToId: (id: string) => ID): express.Application {
   const api = express();
   const sessions = mkSessions(sessionService, itemService, stringToId);
   api.use('/sessions', sessions);

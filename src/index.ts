@@ -11,12 +11,12 @@ import client from './client';
 import { join } from 'path';
 import { stringToObjectID } from "./services/utils";
 
-var argv = require('minimist')(process.argv.slice(2));
+const argv = require('minimist')(process.argv.slice(2));
 
-let raw = process.argv.slice(2);
-let args: any = minimist(raw);
-let logConfig = process.env['LOG_CONFIG'] || args.logConfig || 'info';
-console.log('logconfig: ', logConfig);
+const raw = process.argv.slice(2);
+const args: any = minimist(raw);
+const logConfig = process.env.LOG_CONFIG || args.logConfig || 'info';
+
 init({
   console: true,
   log: logConfig
@@ -29,7 +29,7 @@ process.on('unhandledRejection', (reason, p: Promise<any>) => {
   // application specific logging, throwing an error, or other logic here
 });
 
-let opts = buildOpts(args, process.env);
+const opts = buildOpts(args, process.env);
 
 bootstrap(opts)
   .then((services) => {

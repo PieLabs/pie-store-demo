@@ -12,23 +12,23 @@ export class MongoItemService implements ItemService<ObjectID> {
 
   constructor(private collection: Collection) { }
 
-  list(query: any, skip: number = 0, limit: number = 50): Promise<{}[]> {
+  public list(query: any, skip: number = 0, limit: number = 50): Promise<{}[]> {
     return this.collection.find({}).skip(skip).limit(limit).toArray();
   }
 
-  findById(_id: ObjectID): Promise<{}> {
+  public findById(_id: ObjectID): Promise<{}> {
     return this.collection.findOne({ _id });
   }
 
-  create(item: any): Promise<{}> {
+  public create(item: any): Promise<{}> {
     throw new Error('Method not implemented.');
   }
 
-  update(id: ObjectID, item: any): Promise<{}> {
+  public update(id: ObjectID, item: any): Promise<{}> {
     throw new Error('Method not implemented.');
   }
 
-  delete(id: ObjectID): Promise<boolean> {
+  public delete(id: ObjectID): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 }

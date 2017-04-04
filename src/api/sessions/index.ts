@@ -12,7 +12,7 @@ const logger = buildLogger();
 export default function <ID>(
   sessionService: SessionService<ID>,
   itemService: ItemService<ID>,
-  stringToId: (string) => ID): express.Application {
+  stringToId: (id: string) => ID): express.Application {
 
   const app = express();
   app.use(json());
@@ -70,4 +70,4 @@ export default function <ID>(
     });
 
   return app;
-}
+};

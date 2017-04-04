@@ -17,7 +17,7 @@ export default function <ID>(
   itemService: ItemService<ID>,
   sessionService: SessionService<ID>,
   env: 'dev' | 'prod',
-  stringToId: (string) => ID): express.Application {
+  stringToId: (id: string) => ID): express.Application {
 
   const app = express();
 
@@ -29,15 +29,15 @@ export default function <ID>(
     const cfg = require('./webpack.config');
 
     cfg.output.publicPath = '/';
-    let compiler = webpack(cfg);
-    let middleware = webpackMiddleware(compiler, {
-      publicPath: '/',
-      noInfo: true
+    const compiler = webpack(cfg);
+    const middleware = webpackMiddleware(compiler, {
+      noInfo: true,
+      publicPath: '/'
     });
-    app.use(middleware)
+    app.use(middleware);
   } else {
-    let dir = join(__dirname, '../../lib/client/public');
-    //try and find the .gz version of the file and update the headers accordingly 
+    const dir = join(__dirname, '../../lib/client/public');
+    // try and find the .gz version of the file and update the headers accordingly 
     app.use(gzip.staticFiles(dir));
     app.use(express.static(dir));
   }
@@ -67,25 +67,25 @@ export default function <ID>(
       .then(sessions => {
 
         const endpoints = {
-          views: {
-            editSession: '/session/:sessionId',
-            loadPlayer: '/player/:sessionId'
-          },
           session: {
             create: {
+              method: 'POST',
               url: `/api/sessions/item/:itemId`,
-              method: 'POST'
             },
             delete: {
               method: 'DELETE',
               url: `/api/sessions/:sessionId`
             },
             list: {
-              url: `/api/sessions/item/:itemId`,
-              method: 'GET'
+              method: 'GET',
+              url: `/api/sessions/item/:itemId`
             }
+          },
+          views: {
+            editSession: '/session/:sessionId',
+            loadPlayer: '/player/:sessionId'
           }
-        }
+        };
 
         if (oid) {
           itemService.findById(oid)
@@ -114,7 +114,7 @@ export default function <ID>(
             url: `/api/sessions/${req.sessionId}/player/model`
           }
         }
-      }
+      };
       sessionService.findById(req.sessionId)
         .then((session: any) => {
           itemService.findById(session.itemId)
@@ -123,8 +123,8 @@ export default function <ID>(
               res.render('player', {
                 session,
                 endpoints,
-                markup: item.markup,
-                js: [`/player/${session.itemId}/pie-view.js`]
+                js: [`/player/${session.itemId}/pie-view.js`],
+                markup: item.markup
               });
             });
         })
@@ -141,7 +141,7 @@ export default function <ID>(
             res.setHeader('Content-Type', 'application/javascript');
             res.setHeader('Content-Length', s.size.toString());
             rs.pipe(res);
-          })
+          });
         })
         .catch(next);
     });

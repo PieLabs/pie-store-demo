@@ -9,24 +9,24 @@ export default class PieController {
   }
 
   private callComponentController(fnName, session, env) {
-    let toData = (model) => {
+    const toData = (model) => {
 
       if (!model.element || !model.id) {
         throw new Error(`This model is missing either an 'element' or 'id' property: ${JSON.stringify(model)}`);
       }
 
       return {
-        id: model.id,
         element: model.element,
-        model: model,
+        id: model.id,
+        model,
         session: _.find(session, { id: model.id })
-      }
+      };
     };
 
-    let toPromise = (data) => {
-      let failed = () => Promise.reject(new Error(`Can't find function for ${data.element}`));
+    const toPromise = (data) => {
+      const failed = () => Promise.reject(new Error(`Can't find function for ${data.element}`));
 
-      let modelFn = this.controllerMap[data.element][fnName] || failed;
+      const modelFn = this.controllerMap[data.element][fnName] || failed;
 
       return modelFn(data.model, data.session, env)
         .then(result => {
@@ -35,7 +35,7 @@ export default class PieController {
         });
     };
 
-    let promises = _(this.config.models)
+    const promises = _(this.config.models)
       .map(toData)
       .map(toPromise)
       .value();
