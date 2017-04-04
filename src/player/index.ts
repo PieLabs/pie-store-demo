@@ -4,12 +4,12 @@ import * as webpackMiddleware from 'webpack-dev-middleware';
 
 import { ItemService, SessionService } from './../services';
 import { createReadStream, stat } from 'fs-extra';
+import { gzipStaticFiles, parseId } from './../middleware';
 import { join, resolve } from 'path';
 
 import Controller from './controller';
 import { buildLogger } from 'log-factory';
 import { json } from 'body-parser';
-import { parseId } from './../middleware';
 
 const logger = buildLogger();
 
@@ -39,6 +39,10 @@ export default function mkApp<ID>(
 
   } else {
     // TODO...
+    const dir = join(__dirname, '../../lib/player/public');
+    // try and find the .gz version of the file and update the headers accordingly 
+    app.use(gzipStaticFiles(dir));
+    app.use(express.static(dir));
   }
 
 

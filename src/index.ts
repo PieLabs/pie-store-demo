@@ -17,6 +17,7 @@ const argv = require('minimist')(process.argv.slice(2));
 const raw = process.argv.slice(2);
 const args: any = minimist(raw);
 const logConfig = process.env.LOG_CONFIG || args.logConfig || 'info';
+const env = process.env.NODE_ENV || args.env || 'prod';
 
 init({
   console: true,
@@ -25,6 +26,7 @@ init({
 
 const logger = getLogger('APP');
 
+logger.info('env: ', env);
 process.on('unhandledRejection', (reason, p: Promise<any>) => {
   logger.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
   // application specific logging, throwing an error, or other logic here
@@ -37,7 +39,6 @@ bootstrap(opts)
     const app = express();
 
     const { NODE_ENV } = process.env;
-    const env = NODE_ENV === 'production' || NODE_ENV === 'prod' ? 'prod' : 'dev';
 
     app.use('/', rootClient(services.items, services.sessions, env, stringToObjectID));
     app.use('/player', player(services.items, services.sessions, env, stringToObjectID));

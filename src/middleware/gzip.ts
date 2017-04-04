@@ -13,7 +13,7 @@ export function staticFiles(dir: string): express.Handler {
   return (req, res, next) => {
     logger.debug('req: ', req.path);
 
-    let accepts: string = req.headers['accept-encoding'];
+    const accepts: string = req.headers['accept-encoding'];
 
     if (accepts && accepts.includes('gzip')) {
       let p = req.path;

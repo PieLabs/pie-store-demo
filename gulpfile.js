@@ -6,6 +6,7 @@ const gulp = require('gulp'),
   fsExtra = require('fs-extra'),
   runSequence = require('run-sequence'),
   path = require('path'),
+  webpack = require('webpack'),
   exec = require('child_process').exec;
 
 
@@ -47,12 +48,21 @@ gulp.task('clean', (done) => {
 
 gulp.task('default', ['build']);
 
-gulp.task('copy-client-js', () => {
-  return gulp.src('src/client/**/*.js')
-    .pipe(gulp.dest('lib/client/'));
+gulp.task('build-root', done => {
+  let cfg = require('./src/root/webpack.config');
+  cfg.output.path = path.resolve('./lib/root/public');
+  webpack(cfg, done);
 });
 
-gulp.task('build', done => runSequence('clean', ['pug', 'ts', 'copy-client-js'], done));
+gulp.task('build-player', done => {
+  let cfg = require('./src/player/webpack.config');
+  cfg.output.path = path.resolve('./lib/player/public');
+  webpack(cfg, done);
+});
+
+gulp.task('build-clients', done => runSequence('build-root', 'build-player', done));
+
+gulp.task('build', done => runSequence('clean', ['pug', 'ts', 'build-clients'], done));
 
 gulp.task('dev', ['build', 'watch-pug', 'watch-ts']);
 

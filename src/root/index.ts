@@ -1,15 +1,14 @@
 import * as express from 'express';
-import * as gzip from './middleware/gzip';
 import * as webpack from 'webpack';
 import * as webpackMiddleware from 'webpack-dev-middleware';
 
 import { ItemService, SessionService } from '../services';
 import { createReadStream, stat } from 'fs-extra';
+import { gzipStaticFiles, parseId } from '../middleware';
 import { join, resolve } from 'path';
 
 import { ObjectID } from 'mongodb';
 import { buildLogger } from 'log-factory';
-import { parseId } from './../middleware';
 
 const logger = buildLogger();
 
@@ -36,9 +35,9 @@ export default function <ID>(
     });
     app.use(middleware);
   } else {
-    const dir = join(__dirname, '../../lib/client/public');
+    const dir = join(__dirname, '../../lib/root/public');
     // try and find the .gz version of the file and update the headers accordingly 
-    app.use(gzip.staticFiles(dir));
+    app.use(gzipStaticFiles(dir));
     app.use(express.static(dir));
   }
 
