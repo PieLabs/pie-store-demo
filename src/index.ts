@@ -27,6 +27,7 @@ init({
 const logger = getLogger('APP');
 
 logger.info('env: ', env);
+
 process.on('unhandledRejection', (reason, p: Promise<any>) => {
   logger.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
   // application specific logging, throwing an error, or other logic here
@@ -41,7 +42,13 @@ bootstrap(opts)
     const { NODE_ENV } = process.env;
 
     app.use('/', rootClient(services.items, services.sessions, env, stringToObjectID));
-    app.use('/player', player(services.items, services.sessions, env, stringToObjectID));
+    app.use('/player', player(
+      services.items,
+      services.sessions,
+      services.file,
+      services.controllerCache,
+      env,
+      stringToObjectID));
     app.use('/api', api(services.items, services.sessions, stringToObjectID));
 
     const server = http.createServer(app);

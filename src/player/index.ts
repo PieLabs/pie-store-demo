@@ -7,7 +7,9 @@ import { createReadStream, stat } from 'fs-extra';
 import { gzipStaticFiles, parseId } from './../middleware';
 import { join, resolve } from 'path';
 
-import Controller from './controller';
+import { ControllerCache } from './controller/cache';
+import { FileService } from './file-service';
+import { buildControllerMap } from './vm';
 import { buildLogger } from 'log-factory';
 import { json } from 'body-parser';
 
@@ -16,7 +18,9 @@ const logger = buildLogger();
 export default function mkApp<ID>(
   itemService: ItemService<ID>,
   sessionService: SessionService<ID>,
-  env: 'dev' | 'prod',
+  fileService: FileService,
+  controllerCache: ControllerCache,
+  appEnv: 'dev' | 'prod',
   stringToId: (id: string) => ID
 ) {
   const app = express();
@@ -26,7 +30,7 @@ export default function mkApp<ID>(
   app.set('view engine', 'pug');
   app.set('views', resolve(join(__dirname, 'views')));
 
-  if (env === 'dev') {
+  if (appEnv === 'dev') {
     const cfg = require('./webpack.config');
     logger.silly('set up middleware');
     cfg.output.publicPath = '/';
@@ -70,6 +74,12 @@ export default function mkApp<ID>(
         .then((session: any) => {
           itemService.findById(session.itemId)
             .then((item: any) => {
+
+              controllerCache.load(item.id, item, item.paths.controllers)
+                .then((r) => {
+                  logger.debug('eagerly load the controller for itemId: ', item.id);
+                });
+
               logger.silly('session: ', JSON.stringify(session));
               res.render('player', {
                 session,
@@ -86,41 +96,29 @@ export default function mkApp<ID>(
     addItemId,
     (req: any, res, next) => {
       itemService.findById(req.itemId)
-        .then((item: any) => {
-          stat(item.paths.view, (e, s) => {
-            const rs = createReadStream(item.paths.view);
-            res.setHeader('Content-Type', 'application/javascript');
-            res.setHeader('Content-Length', s.size.toString());
-            rs.pipe(res);
-          });
+        .then((item: any) => fileService.streamAndSize(item.paths.view))
+        .then((r: any) => {
+          const { rs, size } = r;
+          res.setHeader('Content-Type', 'application/javascript');
+          res.setHeader('Content-Length', size.toString());
+          rs.pipe(res);
         })
         .catch(next);
     });
 
   app.post('/:sessionId/model',
     addSessionId,
-    (req: any, res, next) => {
-
+    async (req: any, res, next) => {
       const { session, env } = req.body;
-
       logger.silly('sessionId: ', req.sessionId);
       logger.silly('session: ', JSON.stringify(session));
       logger.silly('env: ', JSON.stringify(env));
-
-      sessionService.findById(req.sessionId)
-        .then((s: any) => {
-          return itemService.findById(s.itemId);
-        })
-        .then((i: any) => {
-          logger.silly('paths: ', i.paths);
-          const controllerMap = require(i.paths.controllers);
-          const controller = new Controller(i, controllerMap);
-          return controller.model(session, env);
-        })
-        .then(result => {
-          res.json(result);
-        })
-        .catch(next);
+      const dbSession = await sessionService.findById(req.sessionId);
+      const item = await itemService.findById(dbSession.itemId);
+      logger.silly('paths: ', item.paths);
+      const controller = await controllerCache.load(item.id, item, item.paths.controllers);
+      const result = await controller.model(session, env);
+      res.json(result);
     });
 
   app.put('/:sessionId/submit', addSessionId, (req, res, next) => {

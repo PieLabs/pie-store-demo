@@ -5,7 +5,7 @@ export interface ItemService<ID> {
   create(item: any): Promise<{}>;
   update(id: ID, item: any): Promise<{}>;
   delete(id: ID): Promise<boolean>;
-  findById(id: ID): Promise<{}>;
+  findById(id: ID): Promise<any>;
 }
 
 export class MongoItemService implements ItemService<ObjectID> {

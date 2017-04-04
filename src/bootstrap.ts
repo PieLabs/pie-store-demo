@@ -1,6 +1,9 @@
 import { Db, MongoClient, ObjectID } from 'mongodb';
+import { FileService, LocalFileService, S3Service } from './player/file-service';
 import { ItemService, MongoItemService, MongoSessionService, SessionService } from './services';
 
+import { ControllerCache } from './player/controller/cache';
+import { S3 } from 'aws-sdk';
 import { buildLogger } from 'log-factory';
 import { join } from 'path';
 
@@ -8,7 +11,9 @@ const logger = buildLogger();
 
 export type Services<ID> = {
   items: ItemService<ID>,
-  sessions: SessionService<ID>
+  sessions: SessionService<ID>,
+  file: FileService,
+  controllerCache: ControllerCache
 }
 
 export type BootstrapOpts = {
@@ -17,24 +22,31 @@ export type BootstrapOpts = {
     prefix: string
   },
   mongoUri: string
-}
+};
 
 export async function bootstrap(opts: BootstrapOpts): Promise<Services<ObjectID>> {
-  const db = await MongoClient.connect(opts.mongoUri);
+  const { s3, mongoUri } = opts;
+  const db = await MongoClient.connect(mongoUri);
   const items: ItemService<ObjectID> = new MongoItemService(db.collection('items'));
   const sessions: SessionService<ObjectID> = new MongoSessionService(db.collection('sessions'));
-  return { items, sessions };
+  const client = new S3();
+
+  const file = (s3.bucket && s3.prefix) ?
+    new S3Service(s3.bucket, s3.prefix, client) :
+    new LocalFileService(join(process.cwd(), 'seed/dev/items'));
+
+  const controllerCache = new ControllerCache(file);
+  return { items, sessions, file, controllerCache };
 }
 
 export function buildOpts(args: any, env: any): BootstrapOpts {
-  let s3 = {
-    bucket: args.bucket || env['S3_BUCKET'],
-    prefix: args.prefix || env['S3_PREFIX']
-  }
+  const s3 = {
+    bucket: args.bucket || env.S3_BUCKET,
+    prefix: args.prefix || env.S3_PREFIX
+  };
 
-  let mongoUri = args.mongoUri || env['MONGO_URI'] || 'mongodb://localhost:27017/pie-store-demo'
-  return {
-    s3,
-    mongoUri
-  }
+
+  const mongoUri = args.mongoUri || env.MONGO_URI || 'mongodb://localhost:27017/pie-store-demo';
+
+  return { s3, mongoUri };
 }
