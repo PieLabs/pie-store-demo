@@ -18,6 +18,8 @@ npm install
 ## run 
 
 ```shell
+cd seed/dev/items/one && pie pack # we currently need to build the view and controller js
+cd -
 bin/seed-dev # seed the db with a corespring-choice item
 ```
 
