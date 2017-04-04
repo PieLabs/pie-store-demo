@@ -1,4 +1,4 @@
-require('./common');
+require('../../client-common/common');
 
 import ItemList from './item-list';
 

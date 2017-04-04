@@ -7,8 +7,9 @@ import { getLogger, init } from 'log-factory';
 
 import { ObjectID } from 'mongodb';
 import api from './api';
-import client from './client';
 import { join } from 'path';
+import player from './player';
+import rootClient from './root';
 import { stringToObjectID } from "./services/utils";
 
 const argv = require('minimist')(process.argv.slice(2));
@@ -38,7 +39,8 @@ bootstrap(opts)
     const { NODE_ENV } = process.env;
     const env = NODE_ENV === 'production' || NODE_ENV === 'prod' ? 'prod' : 'dev';
 
-    app.use('/', client(services.items, services.sessions, env, stringToObjectID));
+    app.use('/', rootClient(services.items, services.sessions, env, stringToObjectID));
+    app.use('/player', player(services.items, services.sessions, env, stringToObjectID));
     app.use('/api', api(services.items, services.sessions, stringToObjectID));
 
     const server = http.createServer(app);

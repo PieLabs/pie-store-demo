@@ -2,7 +2,6 @@ import * as express from 'express';
 
 import { ItemService, SessionService } from '../../services';
 
-import Controller from './controller';
 import { buildLogger } from 'log-factory';
 import { json } from 'body-parser';
 import { parseId } from '../../middleware';
@@ -44,30 +43,5 @@ export default function <ID>(
       .catch(next);
   });
 
-  app.post('/:sessionId/player/model', parse.bind(null, 'sessionId'),
-    (req: any, res, next) => {
-
-      const { session, env } = req.body;
-
-      logger.silly('sessionId: ', req.sessionId);
-      logger.silly('session: ', JSON.stringify(session));
-      logger.silly('env: ', JSON.stringify(env));
-
-      sessionService.findById(req.sessionId)
-        .then((s: any) => {
-          return itemService.findById(s.itemId);
-        })
-        .then((i: any) => {
-          logger.silly('paths: ', i.paths);
-          const controllerMap = require(i.paths.controllers);
-          const controller = new Controller(i, controllerMap);
-          return controller.model(session, env);
-        })
-        .then(result => {
-          res.json(result);
-        })
-        .catch(next);
-    });
-
   return app;
-};
+}

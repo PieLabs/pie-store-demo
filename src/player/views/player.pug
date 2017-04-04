@@ -13,10 +13,10 @@ html
   body
     catalog-container 
       span(slot="header") Pie Demo Store
-      h1 pie player
       pie-player
         | !{markup}  
+      player-controls
 
-    script(src="/player.js")
+    script(src="player.js")
     for j in js 
       script(src=j, type="text/javascript")

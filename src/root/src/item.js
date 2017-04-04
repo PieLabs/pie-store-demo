@@ -1,4 +1,4 @@
-require('./common');
+require('../../client-common/common');
 
 import AjaxLink from './ajax-link';
 import ItemInfo from './item-info';

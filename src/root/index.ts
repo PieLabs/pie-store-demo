@@ -101,51 +101,6 @@ export default function <ID>(
       .catch(next);
   });
 
-  app.get('/player/:sessionId',
-    parse.bind(null, 'sessionId'),
-    (req: any, res, next) => {
-      logger.silly('sessionId:', req.sessionId);
-
-
-      const endpoints = {
-        controller: {
-          model: {
-            method: 'POST',
-            url: `/api/sessions/${req.sessionId}/player/model`
-          }
-        }
-      };
-      sessionService.findById(req.sessionId)
-        .then((session: any) => {
-          itemService.findById(session.itemId)
-            .then((item: any) => {
-              logger.silly('session: ', JSON.stringify(session));
-              res.render('player', {
-                session,
-                endpoints,
-                js: [`/player/${session.itemId}/pie-view.js`],
-                markup: item.markup
-              });
-            });
-        })
-        .catch(next);
-    });
-
-  app.get('/player/:itemId/pie-view.js',
-    parse.bind(null, 'itemId'),
-    (req: any, res, next) => {
-      itemService.findById(req.itemId)
-        .then((item: any) => {
-          stat(item.paths.view, (e, s) => {
-            const rs = createReadStream(item.paths.view);
-            res.setHeader('Content-Type', 'application/javascript');
-            res.setHeader('Content-Length', s.size.toString());
-            rs.pipe(res);
-          });
-        })
-        .catch(next);
-    });
-
   return app;
 }
 
