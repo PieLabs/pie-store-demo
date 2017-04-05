@@ -111,14 +111,21 @@ export default function mkApp<ID>(
     async (req: any, res, next) => {
       const { session, env } = req.body;
       logger.silly('sessionId: ', req.sessionId);
-      logger.silly('session: ', JSON.stringify(session));
+      logger.silly('answers: ', JSON.stringify(session));
       logger.silly('env: ', JSON.stringify(env));
       const dbSession = await sessionService.findById(req.sessionId);
-      const item = await itemService.findById(dbSession.itemId);
-      logger.silly('paths: ', item.paths);
-      const controller = await controllerCache.load(item.id, item, item.paths.controllers);
-      const result = await controller.model(session, env);
-      res.json(result);
+
+      if ((env.mode === 'evaluate' || env.mode === 'view') && !dbSession.isComplete) {
+        res.status(400).json({ error: `Can't return model for ${env.mode} mode if the session is not complete.` });
+      } else if (env.mode === 'gather' && dbSession.isComplete) {
+        res.status(400).json({ error: `Can't return model for gather mode if the session is complete.` });
+      } else {
+        const item = await itemService.findById(dbSession.itemId);
+        logger.silly('paths: ', item.paths);
+        const controller = await controllerCache.load(item.id, item, item.paths.controllers);
+        const result = await controller.model(session, env);
+        res.json(result);
+      }
     });
 
   app.put('/:sessionId/update', addSessionId,

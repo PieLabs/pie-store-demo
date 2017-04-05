@@ -4,6 +4,10 @@ html
     title pie-demo-store 
     link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
 
+    style.
+      h5 {
+        font-family: 'Roboto', sans-serif;
+      } 
 
     script.
        window._pieStore = {};
@@ -17,10 +21,12 @@ html
 
       h-pane     
         div 
+          h5 player
           pie-player
             | !{markup}  
           player-controls
         div 
+          h5 session editor
           session-editor
 
     script(src="player.js")

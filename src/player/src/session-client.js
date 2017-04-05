@@ -30,4 +30,20 @@ export default class SessionClient {
       .then(status)
       .then(json);
   }
+
+  model(answers, env) {
+    let { model: { method, url } } = this.endpoints;
+
+    let opts = {
+      method: method,
+      headers,
+      // need to rename answers to session 
+      body: JSON.stringify({ session: answers, env })
+    }
+
+    return fetch(url, opts)
+      .then(status)
+      .then(json);
+
+  }
 }

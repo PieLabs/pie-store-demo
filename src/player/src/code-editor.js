@@ -6,9 +6,14 @@ const html = `
     display: flex;
   } 
 
+  textarea{
+    width: 100%;
+    height: 100%;
+  }
+
   </style>
   <textarea
-     rows="10" 
+     rows="30" 
      cols="50"></textarea>
 `;
 const template = prepareTemplate(html, 'h-pane');
@@ -40,7 +45,7 @@ export default class CodeEditor extends HTMLElement {
     this._content = c;
 
     try {
-      this._$textArea.textContent = JSON.stringify(this._content, null, '  ');
+      this._$textArea.value = JSON.stringify(this._content, null, '  ');
     } catch (e) {
       console.error(`can't set the content`);
     }

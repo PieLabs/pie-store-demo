@@ -5,7 +5,10 @@ const html = `
   :host {
     display: flex;
   } 
-
+  ::slotted(*){
+    padding: 10px;
+    flex: 1 1 auto;
+  }
   </style>
   <slot></slot>
 `;

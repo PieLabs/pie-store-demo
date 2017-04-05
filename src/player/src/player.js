@@ -53,9 +53,18 @@ const init = () => {
       player.controller = controller;
       player.env = env;
 
+      document.addEventListener('player-controls.switch-mode', e => {
+        const { mode } = e.detail;
+        env.mode = mode;
+        player.env = env;
+      });
+
       document.addEventListener('player-controls.submit', e => {
         client.submit(session.answers)
-          .then(({ env, session }) => player.env = env)
+          .then(({ env, session }) => {
+            player.env = env;
+            sessionEditor.session = session;
+          })
           .catch(e => {
             console.log(e);
           });
