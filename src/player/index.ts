@@ -55,7 +55,7 @@ export default function mkApp<ID>(
 
   app.get('/:sessionId',
     addSessionId,
-    (req: any, res, next) => {
+    async (req: any, res, next) => {
       logger.silly('sessionId:', req.sessionId);
 
 
@@ -70,40 +70,28 @@ export default function mkApp<ID>(
         }
       };
 
-      sessionService.findById(req.sessionId)
-        .then((session: any) => {
-          itemService.findById(session.itemId)
-            .then((item: any) => {
+      const session = await sessionService.findById(req.sessionId);
+      const item = await itemService.findById(session.itemId);
 
-              controllerCache.load(item.id, item, item.paths.controllers)
-                .then((r) => {
-                  logger.debug('eagerly load the controller for itemId: ', item.id);
-                });
+      controllerCache.load(item.id, item, item.paths.controllers);
 
-              logger.silly('session: ', JSON.stringify(session));
-              res.render('player', {
-                session,
-                endpoints,
-                js: [`/player/${session.itemId}/pie-view.js`],
-                markup: item.markup
-              });
-            });
-        })
-        .catch(next);
+      logger.silly('session: ', JSON.stringify(session));
+      res.render('player', {
+        session,
+        endpoints,
+        js: [`/player/${session.itemId}/pie-view.js`],
+        markup: item.markup
+      });
     });
 
   app.get('/:itemId/pie-view.js',
     addItemId,
-    (req: any, res, next) => {
-      itemService.findById(req.itemId)
-        .then((item: any) => fileService.streamAndSize(item.paths.view))
-        .then((r: any) => {
-          const { rs, size } = r;
-          res.setHeader('Content-Type', 'application/javascript');
-          res.setHeader('Content-Length', size.toString());
-          rs.pipe(res);
-        })
-        .catch(next);
+    async (req: any, res, next) => {
+      const item = await itemService.findById(req.itemId);
+      const { rs, size } = await fileService.streamAndSize(item.paths.view);
+      res.setHeader('Content-Type', 'application/javascript');
+      res.setHeader('Content-Length', size.toString());
+      rs.pipe(res);
     });
 
   app.post('/:sessionId/model',
