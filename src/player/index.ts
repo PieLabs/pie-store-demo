@@ -58,6 +58,7 @@ export default function mkApp<ID>(
     async (req: any, res, next) => {
       logger.silly('sessionId:', req.sessionId);
 
+      logger.silly('query: ', req.query);
 
       const endpoints = {
         model: {
@@ -67,16 +68,27 @@ export default function mkApp<ID>(
         submit: {
           method: 'PUT',
           url: `${req.sessionId}/submit`
+        },
+        update: {
+          method: 'PUT',
+          url: `${req.sessionId}/update`
         }
       };
 
       const session = await sessionService.findById(req.sessionId);
       const item = await itemService.findById(session.itemId);
 
+      // trigger load of controller
       controllerCache.load(item.id, item, item.paths.controllers);
 
       logger.silly('session: ', JSON.stringify(session));
+
+      const requestedMode = req.query.mode;
+
+      const mode = session.isComplete ? (requestedMode === 'evaluate' ? 'evaluate' : 'view') : 'gather';
+
       res.render('player', {
+        env: { mode },
         session,
         endpoints,
         js: [`/player/${session.itemId}/pie-view.js`],
@@ -109,9 +121,31 @@ export default function mkApp<ID>(
       res.json(result);
     });
 
-  app.put('/:sessionId/submit', addSessionId, (req, res, next) => {
-    res.json({ mode: 'view' });
-  });
+  app.put('/:sessionId/update', addSessionId,
+    (req: any, res, next) => {
+      const { session } = req.body;
+      sessionService.update(req.sessionId, session)
+        .then(updated => {
+          res.json(updated);
+        })
+        .catch(e => {
+          logger.error(e);
+          res.status(400).json({ error: e.message });
+        });
+    });
+
+  app.put('/:sessionId/submit',
+    addSessionId,
+    (req: any, res, next) => {
+      const { answers } = req.body;
+      sessionService.submitAnswers(req.sessionId, answers)
+        .then(session => {
+          res.json({ env: { mode: 'view' }, session });
+        })
+        .catch(e => {
+          res.status(400).json({ error: e.message });
+        });
+    });
 
   return app;
 }

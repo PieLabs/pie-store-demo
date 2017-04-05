@@ -7,15 +7,21 @@ html
 
     script.
        window._pieStore = {};
+       window._pieStore.env = !{ env ? JSON.stringify(env) : {}};
        window._pieStore.session = !{ session ? JSON.stringify(session) : {}};
        window._pieStore.endpoints = !{ endpoints ? JSON.stringify(endpoints) : {}};
 
   body
     catalog-container 
       span(slot="header") Pie Demo Store
-      pie-player
-        | !{markup}  
-      player-controls
+
+      h-pane     
+        div 
+          pie-player
+            | !{markup}  
+          player-controls
+        div 
+          session-editor
 
     script(src="player.js")
     for j in js 

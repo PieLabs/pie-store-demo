@@ -1,42 +1,65 @@
 require('../../client-common/common');
 
+import CodeEditor from './code-editor';
+import HPane from './h-pane';
 import PiePlayer from 'pie-player';
 import PieStoreController from './pie-store-controller';
 import PlayerControls from './player-controls';
 import SessionClient from './session-client';
+import SessionEditor from './session-editor';
 
 customElements.define('pie-player', PiePlayer);
 customElements.define('player-controls', PlayerControls);
+customElements.define('h-pane', HPane);
+customElements.define('code-editor', CodeEditor);
+customElements.define('session-editor', SessionEditor);
 
 const init = () => {
 
-  const elements = ['pie-player', 'catalog-container'].map(customElements.whenDefined.bind(customElements));
+  const elements = [
+    'pie-player',
+    'catalog-container',
+    'code-editor',
+    'session-editor'].map(customElements.whenDefined.bind(customElements));
 
   Promise.all(elements)
     .then(() => {
       const container = document.querySelector('catalog-container');
       container.isLoading(false);
 
-      const { endpoints } = window._pieStore;
+      const { env, session, endpoints } = _pieStore;
+      const sessionEditor = document.querySelector('session-editor');
+      const player = document.querySelector('pie-player');
       const client = new SessionClient(endpoints);
+      const controller = new PieStoreController(endpoints);
 
-      customElements.whenDefined('pie-player')
-        .then(() => {
-          const player = document.querySelector('pie-player');
-          window._pieStore.session.answers = window._pieStore.session.answers || [];
-          player.session = window._pieStore.session.answers;
-          const controller = new PieStoreController(endpoints);
-          player.controller = controller;
-          player.env = { mode: 'gather' };
+      document.addEventListener('update-session', e => {
+        client.updateSession(e.detail.session)
+          .then(s => {
+            env.mode = s.isComplete ? (env.mode === 'evaluate' ? 'evaluate' : 'view') : 'gather';
+            player.env = env;
+            s.answers = s.answers || [];
+            player.session = s.answers;
+            sessionEditor.session;
+          })
+          .catch(e => console.log(e));
+      });
 
-          document.addEventListener('player-controls.submit', e => {
-            client.submit(player.session)
-              .then((env) => player.env = env)
-              .catch(e => {
-                throw new Error('failed to submit');
-              });
+      sessionEditor.session = session;
+
+      session.answers = session.answers || [];
+
+      player.session = session.answers;
+      player.controller = controller;
+      player.env = env;
+
+      document.addEventListener('player-controls.submit', e => {
+        client.submit(session.answers)
+          .then(({ env, session }) => player.env = env)
+          .catch(e => {
+            console.log(e);
           });
-        });
+      });
     });
 }
 

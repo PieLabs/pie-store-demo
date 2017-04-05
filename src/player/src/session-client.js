@@ -5,15 +5,28 @@ export default class SessionClient {
     this.endpoints = endpoints;
   }
 
-  submit(session) {
-    let { submit } = this.endpoints;
+  updateSession(session) {
+    let { update: { url, method } } = this.endpoints;
     let opts = {
-      method: submit.method,
+      method,
       headers,
       body: JSON.stringify({ session })
     }
 
-    return fetch(submit.url, opts)
+    return fetch(url, opts)
+      .then(status)
+      .then(json);
+  }
+
+  submit(answers) {
+    let { submit: { method, url } } = this.endpoints;
+    let opts = {
+      method: method,
+      headers,
+      body: JSON.stringify({ answers })
+    }
+
+    return fetch(url, opts)
       .then(status)
       .then(json);
   }
