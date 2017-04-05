@@ -12,6 +12,7 @@ const html = `
   </style>
   <slot></slot>
 `;
+
 const template = prepareTemplate(html, 'h-pane');
 
 export default class HPane extends HTMLElement {
@@ -20,5 +21,4 @@ export default class HPane extends HTMLElement {
     super();
     let sr = applyStyle(this, template);
   }
-
 }
