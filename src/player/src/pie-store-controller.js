@@ -5,27 +5,40 @@ export default function RemoteController(endpoints) {
 
   this.model = function (session, env) {
 
-    let { model } = endpoints;
+    let { model: { method, url } } = endpoints;
 
     let opts = {
-      method: model.method,
+      method,
       headers,
       body: JSON.stringify({ session, env })
     }
-
-    return fetch(model.url, opts).then(json);
+    return fetch(url, opts).then(json);
   }
 
   this.submit = function (session) {
-    let { submit } = endpoints;
+    let { submit: { url, method } } = endpoints;
+
     let opts = {
-      method: submit.method,
+      method,
       headers,
       body: JSON.stringify({ session })
     }
 
-    return fetch(submit.url, opts)
+    return fetch(url, opts)
       .then(status)
       .then(json);
   };
+
+  this.outcome = function () {
+    let { outcome: { method, url } } = endpoints;
+
+    let opts = {
+      method,
+      headers
+    }
+
+    return fetch(url)
+      .then(status)
+      .then(json);
+  }
 }
