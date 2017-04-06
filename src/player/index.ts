@@ -1,9 +1,10 @@
 import * as express from 'express';
+import * as marked from 'marked';
 import * as webpack from 'webpack';
 import * as webpackMiddleware from 'webpack-dev-middleware';
 
 import { ItemService, SessionService } from './../services';
-import { createReadStream, stat } from 'fs-extra';
+import { createReadStream, readFile, stat } from 'fs-extra';
 import { gzipStaticFiles, parseId } from './../middleware';
 import { join, resolve } from 'path';
 
@@ -14,6 +15,25 @@ import { buildLogger } from 'log-factory';
 import { json } from 'body-parser';
 
 const logger = buildLogger();
+
+
+const markdown = (p: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    readFile(p, 'utf8', (err, md) => {
+      if (err) {
+        reject(err);
+      } else {
+        marked(md, (e, html) => {
+          if (e) {
+            reject(e);
+          } else {
+            resolve(html);
+          }
+        });
+      }
+    });
+  });
+};
 
 export default function mkApp<ID>(
   itemService: ItemService<ID>,
@@ -86,8 +106,10 @@ export default function mkApp<ID>(
       const requestedMode = req.query.mode;
 
       const mode = session.isComplete ? (requestedMode === 'evaluate' ? 'evaluate' : 'view') : 'gather';
+      const playerNotes = await markdown(join(__dirname, 'player-notes.md'));
 
       res.render('player', {
+        playerNotes,
         env: { mode },
         session,
         endpoints,

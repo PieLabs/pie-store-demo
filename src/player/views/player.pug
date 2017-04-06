@@ -19,6 +19,7 @@ html
     catalog-container 
       span(slot="header") Pie Demo Store
 
+        
       h-pane     
         div 
           h5 player
@@ -28,6 +29,10 @@ html
         div 
           h5 session editor
           session-editor
+
+      div 
+        
+        | !{playerNotes}
 
     script(src="player.js")
     for j in js 
