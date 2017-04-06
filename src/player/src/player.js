@@ -14,6 +14,10 @@ customElements.define('h-pane', HPane);
 customElements.define('code-editor', CodeEditor);
 customElements.define('session-editor', SessionEditor);
 
+const store = () => {
+  return window._pieStore;
+};
+
 const init = () => {
 
   const elements = [
@@ -27,31 +31,33 @@ const init = () => {
       const container = document.querySelector('catalog-container');
       container.isLoading(false);
 
-      const { env, session, endpoints } = _pieStore;
+      const { env, session, endpoints } = store();
       const sessionEditor = document.querySelector('session-editor');
       const player = document.querySelector('pie-player');
       const client = new SessionClient(endpoints);
       const controller = new PieStoreController(endpoints);
+
+      const updateSession = (s) => {
+        _pieStore.session = s;
+        sessionEditor.session = s;
+        session.answers = s.answers || [];
+        player.session = s.answers;
+      };
+
+      updateSession(_pieStore.session);
+
+      player.controller = controller;
+      player.env = env;
 
       document.addEventListener('update-session', e => {
         client.updateSession(e.detail.session)
           .then(s => {
             env.mode = s.isComplete ? (env.mode === 'evaluate' ? 'evaluate' : 'view') : 'gather';
             player.env = env;
-            s.answers = s.answers || [];
-            player.session = s.answers;
-            sessionEditor.session;
+            updateSession(s);
           })
           .catch(e => console.log(e));
       });
-
-      sessionEditor.session = session;
-
-      session.answers = session.answers || [];
-
-      player.session = session.answers;
-      player.controller = controller;
-      player.env = env;
 
       document.addEventListener('player-controls.switch-mode', e => {
         const { mode } = e.detail;
@@ -60,7 +66,7 @@ const init = () => {
       });
 
       document.addEventListener('player-controls.submit', e => {
-        client.submit(session.answers)
+        client.submit(_pieStore.session.answers)
           .then(({ env, session }) => {
             player.env = env;
             sessionEditor.session = session;
