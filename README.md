@@ -14,12 +14,13 @@ npm install
 ### backend dependencies
 
 * mongodb - for storing metadata about the element from github and from the archive
+* s3 - for storing a pie item's js and assets 
+
+> s3 is only needed when running in prod/heroku.
 
 ## run 
 
 ```shell
-cd seed/dev/items/one && pie pack # we currently need to build the view and controller js
-cd -
 bin/seed-dev # seed the db with a corespring-choice item
 ```
 
@@ -37,5 +38,7 @@ node lib/index.js #add params here or have the env vars set.
 
 | param | env-var  | default  | description |
 |-------|----------|----------|-------------|
-|`--mongoUri` | `MONGO_URI` | mongodb://localhost:27017/pie-catalog  | the mongo uri |
+|`--mongoUri` | `MONGO_URI` | mongodb://localhost:27017/pie-store-demo  | the mongo uri |
+|`--bucket` | `S3_BUCKET` | pie-store-demo  | the s3 bucket |
+|`--prefix` | `S3_PREFIX` | test  | the prefix within the bucket |
 
