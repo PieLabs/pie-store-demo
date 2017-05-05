@@ -2,6 +2,20 @@
 
 A web app that runs pie libraries and elements with persisted sessions and items.
 
+
+# Paths
+
+`/` - root page list items
+`/items/:itemId` - item page - list sessions for that item
+`/player/:sessionId` - player page - load the player for the session
+
+To add:
+* full player page
+* create items (atm they are seeded)
+* bundle building from items
+* users/auth?
+* registration?
+
 ## install 
 ```
 npm install 
