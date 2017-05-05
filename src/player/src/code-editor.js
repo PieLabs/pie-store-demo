@@ -16,7 +16,7 @@ const html = `
      rows="30" 
      cols="50"></textarea>
 `;
-const template = prepareTemplate(html, 'h-pane');
+const template = prepareTemplate(html, 'error-log');
 export default class CodeEditor extends HTMLElement {
 
   constructor() {

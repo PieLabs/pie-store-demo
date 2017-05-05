@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
+  devtool: 'eval-source-map',
   context: path.join(__dirname),
   entry: {
     player: './src/player.js',

@@ -12,7 +12,11 @@ export default function RemoteController(endpoints) {
       headers,
       body: JSON.stringify({ session, env })
     }
-    return fetch(url, opts).then(json);
+    let p = fetch(url, opts)
+      .then(status)
+      .then(json);
+    console.log('model promise: ', p);
+    return p;
   }
 
   this.submit = function (session) {
