@@ -36,7 +36,7 @@ const init = () => {
       const { env, session, endpoints } = store();
       const sessionEditor = document.querySelector('session-editor');
       const player = document.querySelector('pie-player');
-      const errorLog = document.querySelector('error-log');
+      const log = document.querySelector('error-log');
       const client = new SessionClient(endpoints);
       const controller = new PieStoreController(endpoints);
 
@@ -58,7 +58,7 @@ const init = () => {
 
       player.addEventListener('pie.model-update.error', e => {
         console.log('model update failed', e);
-        errorLog.addError(e.detail.error);
+        log.error(e.detail.error);
       });
 
       //from the session editor
@@ -79,6 +79,19 @@ const init = () => {
         player.env = env;
       });
 
+      document.addEventListener('player-controls.get-outcome', e => {
+        const { env, session } = store();
+
+        player.getOutcome(session, env)
+          .then(o => {
+            console.log('outcome: ', o);
+            log.info('outcome', o);
+          })
+          .catch(e => {
+            log.error(e);
+          });
+      });
+
       document.addEventListener('player-controls.submit', e => {
         client.submit(_pieStore.session.answers)
           .then(({ env, session }) => {
@@ -86,7 +99,7 @@ const init = () => {
             sessionEditor.session = session;
           })
           .catch(e => {
-            errorLog.addError(e);
+            log.error(e);
           });
       });
     });

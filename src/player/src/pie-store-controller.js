@@ -33,15 +33,16 @@ export default function RemoteController(endpoints) {
       .then(json);
   };
 
-  this.outcome = function () {
+  this.outcome = function (session, env) {
     let { outcome: { method, url } } = endpoints;
 
     let opts = {
       method,
-      headers
+      headers,
+      body: JSON.stringify({ session, env })
     }
 
-    return fetch(url)
+    return fetch(url, opts)
       .then(status)
       .then(json);
   }

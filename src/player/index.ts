@@ -85,6 +85,10 @@ export default function mkApp<ID>(
           method: 'POST',
           url: `${req.sessionId}/model`
         },
+        outcome: {
+          method: 'POST',
+          url: `${req.sessionId}/outcome`
+        },
         submit: {
           method: 'PUT',
           url: `${req.sessionId}/submit`
@@ -174,6 +178,23 @@ export default function mkApp<ID>(
         .catch(e => {
           res.status(400).json({ error: e.message });
         });
+    });
+
+  app.post('/:sessionId/outcome', addSessionId,
+    async (req: any, res, next) => {
+      const dbSession = await sessionService.findById(req.sessionId);
+
+      if (!dbSession.isComplete) {
+        res.status(400).json({ error: `can't return outcome if the session is not complete` });
+      } else {
+        const { session, env } = req.body;
+        const item = await itemService.findById(dbSession.itemId);
+        logger.silly('paths: ', item.paths);
+        const controller = await controllerCache.load(item.id, item, item.paths.controllers);
+        const result = await controller.outcome(session, env);
+        res.json(result);
+      }
+
     });
 
   return app;

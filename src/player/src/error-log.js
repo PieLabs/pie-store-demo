@@ -1,5 +1,7 @@
 import { applyStyle, prepareTemplate } from 'pie-catalog-client/src/styles';
 
+import dateformat from 'dateformat';
+
 const html = `
   <style>
   :host {
@@ -19,9 +21,19 @@ const html = `
     margin: 10px;
   }
 
+  .error::before{
+    color: red;
+    content: '[ERROR] ';
+  }
+  
+  .info::before{
+    color: blue;
+    content: '[INFO] ';
+  }
+
   </style>
   <div id="header">
-    <label id="title">Error Log</label>
+    <label id="title">Log</label>
     <button id="clear">clear</button>
   </div>
   <div id="log"></div>
@@ -35,6 +47,7 @@ export default class ErrorLog extends HTMLElement {
     let sr = applyStyle(this, template);
     this._$log = sr.querySelector('#log');
     this._$button = sr.querySelector('#clear');
+    this.format = (now) => dateformat(now, "h:MM:ss TT");
   }
 
   connectedCallback() {
@@ -43,9 +56,30 @@ export default class ErrorLog extends HTMLElement {
     });
   }
 
-  addError(e) {
+  log(level, ...args) {
     const log = document.createElement('div');
-    log.textContent = `${new Date()} - ${e.message}`;
+    log.setAttribute('class', level);
+
+    const msg = args.map(a => {
+      if (typeof a === 'string') {
+        return a;
+      } if (a instanceof Error) {
+        return a.message;
+      } else {
+        return JSON.stringify(a);
+      }
+    }).join(' ');
+
+    log.textContent = `${this.format(new Date())} - ${msg}`;
+
     this._$log.appendChild(log);
+  }
+
+  error(e) {
+    this.log('error', e);
+  }
+
+  info(...args) {
+    this.log('info', ...args);
   }
 }

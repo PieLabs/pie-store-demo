@@ -21,6 +21,8 @@ The ui also provides a way of making raw changes without constraints to assist w
 * a user may only save changes when `session.isComplete` is `false`.
 * a user may only submit (save & set `session.isComplete` to `true`) when `session.isComplete` is `false`.
 * a user may change modes to `view` and `evaluate` mode if `session.isComplete` is `true` but not to `gather`.
+* `getOutcome` will only return the outcome if `session.isComplete` is `true`.
+* `getOutcome` will fail if the responses passed in from the client, don't match what's saved in the session.
 
 
 ## app <=> pie api 

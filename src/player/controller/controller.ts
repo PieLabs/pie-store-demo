@@ -8,6 +8,10 @@ export default class PieController {
     return this.callComponentController('model', session, env)
   }
 
+  public outcome(session: { id: string }[], env) {
+    return this.callComponentController('outcome', session, env);
+  }
+
   private callComponentController(fnName, session, env) {
     const toData = (model) => {
 

@@ -6,16 +6,24 @@ const html = `
   <button id="gather">gather</button>
   <button id="view">view</button>
   <button id="evaluate">evaluate</button>
+  <button id="get-outcome">get outcome</button>
 </span>
 `;
 
-const switchMode = (mode) => {
-  return new CustomEvent('player-controls.switch-mode', {
+const switchMode = (mode) => new CustomEvent(
+  'player-controls.switch-mode', {
     composed: true,
     bubbles: true,
     detail: { mode }
   });
-}
+
+
+const getOutcome = () => new CustomEvent(
+  'player-controls.get-outcome', {
+    composed: true,
+    bubbles: true
+  });
+
 
 const template = prepareTemplate(html, 'player-controls');
 
@@ -27,6 +35,7 @@ export default class PlayerControls extends HTMLElement {
     this._$gather = sr.querySelector('#gather');
     this._$view = sr.querySelector('#view');
     this._$evaluate = sr.querySelector('#evaluate');
+    this._$getOutcome = sr.querySelector('#get-outcome');
   }
 
   connectedCallback() {
@@ -44,6 +53,10 @@ export default class PlayerControls extends HTMLElement {
 
     this._$evaluate.addEventListener('click', e => {
       this.dispatchEvent(switchMode('evaluate'))
+    });
+
+    this._$getOutcome.addEventListener('click', e => {
+      this.dispatchEvent(getOutcome());
     });
   }
 }
