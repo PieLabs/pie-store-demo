@@ -56,3 +56,8 @@ node lib/index.js #add params here or have the env vars set.
 |`--bucket` | `S3_BUCKET` | pie-store-demo  | the s3 bucket |
 |`--prefix` | `S3_PREFIX` | test  | the prefix within the bucket |
 
+ 
+
+## todos
+
+* in dev mode reload controller/client logic.

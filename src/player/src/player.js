@@ -61,6 +61,10 @@ const init = () => {
         log.error(e.detail.error);
       });
 
+      player.addEventListener('status-changed', e => {
+        log.info('received status-changed', e.detail.statuses);
+      })
+
       //from the session editor
       document.addEventListener('update-session', e => {
         client.updateSession(e.detail.session)
@@ -86,6 +90,19 @@ const init = () => {
           .then(o => {
             console.log('outcome: ', o);
             log.info('outcome', o);
+          })
+          .catch(e => {
+            log.error(e);
+          });
+      });
+
+      document.addEventListener('player-controls.get-status', e => {
+        const { env, session } = store();
+
+        player.status()
+          .then(o => {
+            console.log('status: ', o);
+            log.info('status', o);
           })
           .catch(e => {
             log.error(e);

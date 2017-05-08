@@ -1,4 +1,5 @@
 import { applyStyle, prepareTemplate } from 'pie-catalog-client/src/styles';
+
 const html = `
 <span>
   <button id="submit" title="saves answers, and sets isComplete to true">submit</button>
@@ -6,7 +7,9 @@ const html = `
   <button id="gather">gather</button>
   <button id="view">view</button>
   <button id="evaluate">evaluate</button>
+  |
   <button id="get-outcome">get outcome</button>
+  <button id="status">status</button>
 </span>
 `;
 
@@ -17,13 +20,17 @@ const switchMode = (mode) => new CustomEvent(
     detail: { mode }
   });
 
-
 const getOutcome = () => new CustomEvent(
   'player-controls.get-outcome', {
     composed: true,
     bubbles: true
   });
 
+const getStatus = () => new CustomEvent(
+  'player-controls.get-status', {
+    composed: true,
+    bubbles: true
+  });
 
 const template = prepareTemplate(html, 'player-controls');
 
@@ -36,6 +43,7 @@ export default class PlayerControls extends HTMLElement {
     this._$view = sr.querySelector('#view');
     this._$evaluate = sr.querySelector('#evaluate');
     this._$getOutcome = sr.querySelector('#get-outcome');
+    this._$status = sr.querySelector('#status');
   }
 
   connectedCallback() {
@@ -57,6 +65,10 @@ export default class PlayerControls extends HTMLElement {
 
     this._$getOutcome.addEventListener('click', e => {
       this.dispatchEvent(getOutcome());
+    });
+
+    this._$status.addEventListener('click', e => {
+      this.dispatchEvent(getStatus());
     });
   }
 }

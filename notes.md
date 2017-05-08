@@ -25,3 +25,4 @@ I've been looking at the documented `pie` element and `pie-player` api and I'd l
 
 * `pie.responseComplete` & `pie.responseChanged` -> `response-changed` w/ `{detail: {complete: true|false, id: pie-id}}`
 * keep `pie.register`? or rename to `register-pie` or even `pie-element-connected` closer to what has actually happened for the pie element instance?
+* `models-updated` - dispatch when either `model` or `session` is set. It's ok to debounce these to 1 call, event detail contains: `{hasModel, hasSession, complete}`.

@@ -76,6 +76,7 @@ export default class ErrorLog extends HTMLElement {
   }
 
   error(e) {
+    console.error(e);
     this.log('error', e);
   }
 

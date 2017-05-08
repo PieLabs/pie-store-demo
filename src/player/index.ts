@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as express from 'express';
 import * as marked from 'marked';
 import * as webpack from 'webpack';
@@ -180,21 +181,24 @@ export default function mkApp<ID>(
         });
     });
 
+  const sessionsMatch = (a, b) => _.isEqual(a, b);
+
   app.post('/:sessionId/outcome', addSessionId,
     async (req: any, res, next) => {
       const dbSession = await sessionService.findById(req.sessionId);
+      const { session, env } = req.body;
 
       if (!dbSession.isComplete) {
         res.status(400).json({ error: `can't return outcome if the session is not complete` });
+      } else if (!sessionsMatch(dbSession.answers, session)) {
+        res.status(400).json({ error: `The session from the client doesn't match the saved session` });
       } else {
-        const { session, env } = req.body;
         const item = await itemService.findById(dbSession.itemId);
         logger.silly('paths: ', item.paths);
         const controller = await controllerCache.load(item.id, item, item.paths.controllers);
         const result = await controller.outcome(session, env);
         res.json(result);
       }
-
     });
 
   return app;

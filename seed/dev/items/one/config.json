@@ -5,7 +5,7 @@
     "zh-CN"
   ],
   "elements": {
-    "corespring-choice": "2.0.0-prerelease"
+    "corespring-choice": "../../../../../../PieElements/corespring-choice"
   },
   "models": [
     {
