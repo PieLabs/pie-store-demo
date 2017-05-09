@@ -2080,10 +2080,12 @@ function model(question, session, env) {
 
     let responseCorrect = env.mode === 'evaluate' ? isResponseCorrect(question, session) : undefined;
     let out = __WEBPACK_IMPORTED_MODULE_1_lodash_cloneDeep___default()(question);
+
     /** completeness - must have at least the correctResponse.length */
     out.complete = {
       min: out.choices.filter(c => c.correct).length
     }
+
     out.choices = out.choices.map(prepareChoice.bind(null, responseCorrect));
     out.prompt = getLabel(out.prompt, env.locale, question.defaultLang);
     out.disabled = env.mode !== 'gather';

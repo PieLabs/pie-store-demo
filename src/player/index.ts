@@ -97,6 +97,10 @@ export default function mkApp<ID>(
         update: {
           method: 'PUT',
           url: `${req.sessionId}/update`
+        },
+        updateWithConstraints: {
+          method: 'PUT',
+          url: `${req.sessionId}/update-with-constraints`
         }
       };
 
@@ -133,21 +137,30 @@ export default function mkApp<ID>(
       rs.pipe(res);
     });
 
+
+  const addSavedSession = async (req, res, next) => {
+    const { session, env } = req.body;
+    logger.silly('sessionId: ', req.sessionId);
+    req.savedSession = await sessionService.findById(req.sessionId);
+    next();
+  }
+
   app.post('/:sessionId/model',
     addSessionId,
+    addSavedSession,
     async (req: any, res, next) => {
       const { session, env } = req.body;
+      const { sessionId, savedSession } = req;
       logger.silly('sessionId: ', req.sessionId);
       logger.silly('answers: ', JSON.stringify(session));
       logger.silly('env: ', JSON.stringify(env));
-      const dbSession = await sessionService.findById(req.sessionId);
 
-      if ((env.mode === 'evaluate' || env.mode === 'view') && !dbSession.isComplete) {
+      if ((env.mode === 'evaluate' || env.mode === 'view') && !savedSession.isComplete) {
         res.status(400).json({ error: `Can't return model for ${env.mode} mode if the session is not complete.` });
-      } else if (env.mode === 'gather' && dbSession.isComplete) {
+      } else if (env.mode === 'gather' && savedSession.isComplete) {
         res.status(400).json({ error: `Can't return model for gather mode if the session is complete.` });
       } else {
-        const item = await itemService.findById(dbSession.itemId);
+        const item = await itemService.findById(savedSession.itemId);
         logger.silly('paths: ', item.paths);
         const controller = await controllerCache.load(item.id, item, item.paths.controllers);
         const result = await controller.model(session, env);
@@ -155,7 +168,9 @@ export default function mkApp<ID>(
       }
     });
 
-  app.put('/:sessionId/update', addSessionId,
+  app.put('/:sessionId/update',
+    addSessionId,
+    addSavedSession,
     (req: any, res, next) => {
       const { session } = req.body;
       sessionService.update(req.sessionId, session)
@@ -166,6 +181,25 @@ export default function mkApp<ID>(
           logger.error(e);
           res.status(400).json({ error: e.message });
         });
+    });
+
+  app.put('/:sessionId/update-with-constraints',
+    addSessionId,
+    addSavedSession,
+    (req: any, res, next) => {
+      const { session } = req.body;
+      if (req.savedSession.isComplete) {
+        res.status(400).json({ error: `Can't update if the session is complete` })
+      } else {
+        sessionService.update(req.sessionId, session)
+          .then(updated => {
+            res.json(updated);
+          })
+          .catch(e => {
+            logger.error(e);
+            res.status(400).json({ error: e.message });
+          });
+      }
     });
 
   app.put('/:sessionId/submit',

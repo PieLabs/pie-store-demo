@@ -52,6 +52,23 @@ const init = () => {
       player.controller = controller;
       player.env = env;
 
+      player.addEventListener('response-changed', e => {
+        console.log('response-changed', e.target);
+        sessionEditor.session = store().session;
+        player.status()
+          .then(s => {
+            log.info('[response-changed] status: ', s);
+          })
+      });
+
+      player.addEventListener('model-set', e => {
+        console.log('model-set', e.target);
+        player.status()
+          .then(s => {
+            log.info('[model-set] status: ', s);
+          });
+      });
+
       player.addEventListener('pie.model-updated', e => {
         console.log('model updated successfully', e);
       });
@@ -91,9 +108,7 @@ const init = () => {
             console.log('outcome: ', o);
             log.info('outcome', o);
           })
-          .catch(e => {
-            log.error(e);
-          });
+          .catch(log.error);
       });
 
       document.addEventListener('player-controls.get-status', e => {
@@ -104,9 +119,7 @@ const init = () => {
             console.log('status: ', o);
             log.info('status', o);
           })
-          .catch(e => {
-            log.error(e);
-          });
+          .catch(e => log.error(e));
       });
 
       document.addEventListener('player-controls.submit', e => {
@@ -115,9 +128,29 @@ const init = () => {
             player.env = env;
             sessionEditor.session = session;
           })
-          .catch(e => {
-            log.error(e);
-          });
+          .catch(e => log.error(e));
+      });
+
+      document.addEventListener('player-controls.reset-response', e => {
+        player.resetResponse()
+          .then(() => client.updateSession(store().session, true))
+          .then(() => {
+            player.session = store().session.answers;
+            sessionEditor.session = store().session;
+            log.info('reset-response complete.');
+          })
+          .catch(e => log.error(e));
+      });
+
+      document.addEventListener('player-controls.reset', e => {
+        player.reset()
+          .then(() => client.updateSession(store().session, true))
+          .then(() => {
+            player.session = store().session.answers;
+            sessionEditor.session = store().session;
+            log.info('reset complete.');
+          })
+          .catch(e => log.error(e));
       });
     });
 }
