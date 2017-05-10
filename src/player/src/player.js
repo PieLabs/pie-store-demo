@@ -16,6 +16,8 @@ customElements.define('code-editor', CodeEditor);
 customElements.define('session-editor', SessionEditor);
 customElements.define('error-log', ErrorLog);
 
+//TODO: Use a binding lib built w/ es6 proxies?
+
 const store = () => {
   return window._pieStore;
 };
