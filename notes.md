@@ -8,13 +8,16 @@ I've been looking at the documented `pie` element and `pie-player` api and I'd l
 * `reset()` - retain. Update the docs to say: 'delete all properties in each object in the sessions array except for `id`.' * Does not update the pie elements - you have to do that yourself *
 * `resetResponse()` - retain. Update the docs to say: 'delete `response` field in each object in the sessions array. * Does not update the pie elements - you have to do that yourself * (you may have additional steps, like saving that you want to successfully perform, before updating the ui.)
 * rename `getSessionStatus()` to either `status()` or `sessionsStatus()` that returns an array that mirrors what's in `sessions`: `[{id, complete}, ...]`. We can add an `responsesComplete()` method at a later point that does `sessions().find(s => !s.complete) === undefined`.
- 
+
+* rename `set env` -> `env(e) : Promise<env>` - this triggers a call to `controller.model` which can fail. However we have no way to handle that failure that came as a result to setting the env. With the function, we can know that the env wasn't set. 
+* rename `set sessions` -> `sessions(s) : Promise<sessions>` - as above this can cause a failure, that a client may want to handle.
+
 ## make event names consistent. 
 * pick camel or kebab case , i'm suggesting kebab.
 * remove namespaces
 * `pie-player-ready` -> `ready`
 * `pie.model-updated` -> `model-updated` - fired when the call to `controller.model` succeeded
-* NEW: `model-update-failed` - when an error is caught calling `controller.model`. `{detail: { error}}`
+* NEW: `model-update-failed` - when an error is caught calling `controller.model`. `{detail: { error}}` - if the new set functions are in place this may no longer be needed.
 * Note: no need for events for `getOutcome` because it returns a promise.
 
 ## `pie` element
@@ -23,11 +26,9 @@ I've been looking at the documented `pie` element and `pie-player` api and I'd l
 ### events
 
 * `response-changed` - fired by a pie instance when a response changes 
-* `model-set` - fired by a pie instance when the model is set 
 * `pie.responseComplete` & `pie.responseChanged` -> `response-changed` w/ `{detail: {complete: true|false, id: pie-id}}`. triggered when the `session` is set and when the user changes the response.
 * keep `pie.register`? or rename to `register-pie` or even `pie-element-connected` closer to what has actually happened for the pie element instance?
-* `model-updated` - dispatch when `model` is set. event detail contains: `{hasModel, complete}`.
-
+* `model-set` - dispatch when `model` is set. event detail contains: `{hasModel, complete}`.
 
 
 # pie element controller changes
@@ -47,8 +48,8 @@ return:
 
 ```
 
-* remove `success`
-* remove `duration`
+* remove `success` - what does this mean?
+* remove `duration` - this is out of scope (will add to demo)
 * change `score` to value between `0.0` and `1.0` instead of an object
 
 

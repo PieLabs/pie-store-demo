@@ -28,7 +28,7 @@ const init = () => {
     'pie-player',
     'catalog-container',
     'code-editor',
-    'session-editor'].map(customElements.whenDefined.bind(customElements));
+    'session-editor'].map(n => customElements.whenDefined(n));
 
   Promise.all(elements)
     .then(() => {
@@ -91,7 +91,7 @@ const init = () => {
 
       player.addEventListener('status-changed', e => {
         log.info('received status-changed', e.detail.statuses);
-      })
+      });
 
       //from the session editor
       document.addEventListener('update-session', e => {
