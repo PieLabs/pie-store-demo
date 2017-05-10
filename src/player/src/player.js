@@ -59,7 +59,7 @@ const init = () => {
         player.status()
           .then(s => {
             const ac = allComplete(s);
-            controls.canSubmit = ac && !session.isComplete;
+            controls.canSubmit = ac && !store().session.isComplete;
             log.info('[response-changed] status: ', s);
           });
       }
@@ -98,6 +98,7 @@ const init = () => {
             env.mode = s.isComplete ? (env.mode === 'evaluate' ? 'evaluate' : 'view') : 'gather';
             player.env = env;
             updateSession(s);
+            updateCanSubmit();
           })
           .catch(e => console.log(e));
       });
@@ -135,6 +136,7 @@ const init = () => {
         client.submit(_pieStore.session.answers)
           .then(({ env, session }) => {
             player.env = env;
+            store().session = session;
             sessionEditor.session = session;
             updateCanSubmit();
           })
