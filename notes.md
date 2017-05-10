@@ -27,3 +27,46 @@ I've been looking at the documented `pie` element and `pie-player` api and I'd l
 * `pie.responseComplete` & `pie.responseChanged` -> `response-changed` w/ `{detail: {complete: true|false, id: pie-id}}`. triggered when the `session` is set and when the user changes the response.
 * keep `pie.register`? or rename to `register-pie` or even `pie-element-connected` closer to what has actually happened for the pie element instance?
 * `model-updated` - dispatch when `model` is set. event detail contains: `{hasModel, complete}`.
+
+
+
+# pie element controller changes
+
+## outcome
+[docs](https://github.com/PieLabs/pie-docs/blob/master/developing/controller.md#function-outcomeconfig-session-env)
+
+
+return: 
+
+```javascript
+{
+  score: 0.0 <-> 1.0
+  completed: true|false
+  extensions?: {}
+}
+
+```
+
+* remove `success`
+* remove `duration`
+* change `score` to value between `0.0` and `1.0` instead of an object
+
+
+# pie controller changes
+
+`controller.outcome` returns: 
+
+```javascript
+
+//Note: id is added to each pie elements outcome object.
+
+{
+  summary: { percentage: 100, min: 0, max: 10, outcome: 10},
+  pies: [
+    {id: 1, score: 1.0}
+  ],
+  weights: [
+    {id: 1, weight: 10}
+  ]
+}
+```

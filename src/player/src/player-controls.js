@@ -2,7 +2,7 @@ import { applyStyle, prepareTemplate } from 'pie-catalog-client/src/styles';
 
 const html = `
 <span>
-  <button id="submit" title="saves answers, and sets isComplete to true">submit</button>
+  <button id="submit" disabled="disabled" title="saves answers, and sets isComplete to true">submit</button>
   |
   <button data-event="switch-mode" data-mode="gather">gather</button>
   <button data-event="switch-mode" data-mode="view">view</button>
@@ -22,6 +22,17 @@ export default class PlayerControls extends HTMLElement {
   constructor() {
     super();
     let sr = applyStyle(this, template);
+  }
+
+  set canSubmit(c) {
+    this._canSubmit = c;
+    const $submit = this.shadowRoot.querySelector('#submit');
+
+    if (this._canSubmit) {
+      $submit.removeAttribute('disabled');
+    } else {
+      $submit.setAttribute('disabled', 'disabled');
+    }
   }
 
   connectedCallback() {

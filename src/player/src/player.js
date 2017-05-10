@@ -38,7 +38,10 @@ const init = () => {
       const player = document.querySelector('pie-player');
       const log = document.querySelector('error-log');
       const client = new SessionClient(endpoints);
+      const controls = document.querySelector('player-controls');
       const controller = new PieStoreController(endpoints);
+
+      const allComplete = (statuses) => !_.some(statuses, s => !s.complete);
 
       const updateSession = (s) => {
         _pieStore.session = s;
@@ -52,13 +55,19 @@ const init = () => {
       player.controller = controller;
       player.env = env;
 
+      const updateCanSubmit = () => {
+        player.status()
+          .then(s => {
+            const ac = allComplete(s);
+            controls.canSubmit = ac && !session.isComplete;
+            log.info('[response-changed] status: ', s);
+          });
+      }
+
       player.addEventListener('response-changed', e => {
         console.log('response-changed', e.target);
         sessionEditor.session = store().session;
-        player.status()
-          .then(s => {
-            log.info('[response-changed] status: ', s);
-          })
+        updateCanSubmit();
       });
 
       player.addEventListener('model-set', e => {
@@ -108,7 +117,7 @@ const init = () => {
             console.log('outcome: ', o);
             log.info('outcome', o);
           })
-          .catch(log.error);
+          .catch(e => log.error(e));
       });
 
       document.addEventListener('player-controls.get-status', e => {
@@ -127,10 +136,22 @@ const init = () => {
           .then(({ env, session }) => {
             player.env = env;
             sessionEditor.session = session;
+            updateCanSubmit();
           })
           .catch(e => log.error(e));
       });
 
+
+      /**
+       * TODO: reset/resetResponse api - needs to change.
+       * We need a way to allow the context to apply or allow the changes that 
+       * happen to the model during a reset.
+       * Options:  
+       * 1. reset just returns the new model, the context can then use that to see if it's ok and if so, then apply it.
+       * 2. reset takes a predicate function: `resetOk(updatedModel) : Promise`, if the predicate fails then the change won't be applied internally in the player.
+       * 
+       * Note: that the context and the player share the same session instance.
+       */
       document.addEventListener('player-controls.reset-response', e => {
         player.resetResponse()
           .then(() => client.updateSession(store().session, true))

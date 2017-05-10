@@ -6,6 +6,8 @@ const html = `
   <style>
   :host {
     display: block;
+    font-family: sans-serif;
+    font-size: 12px;
   } 
 
   #header{
@@ -29,6 +31,12 @@ const html = `
   .info::before{
     color: blue;
     content: '[INFO] ';
+  }
+
+
+  #log {
+    max-height: 200px;
+    overflow: auto;
   }
 
   </style>
@@ -73,6 +81,7 @@ export default class ErrorLog extends HTMLElement {
     log.textContent = `${this.format(new Date())} - ${msg}`;
 
     this._$log.appendChild(log);
+    this._$log.scrollTop = this._$log.scrollHeight;
   }
 
   error(e) {
