@@ -5,8 +5,12 @@ export default class SessionClient {
     this.endpoints = endpoints;
   }
 
-  updateSession(session) {
-    let { update: { url, method } } = this.endpoints;
+  updateSession(session, withConstraints = false) {
+
+    let update = withConstraints ? this.endpoints.updateWithConstraints : this.endpoints.update;
+
+    let { url, method } = update;
+
     let opts = {
       method,
       headers,

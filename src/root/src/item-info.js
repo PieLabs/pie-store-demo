@@ -30,7 +30,6 @@ export default class ItemInfo extends HTMLElement {
   }
 
   _render() {
-
     this._renderSessions();
     this._renderEndpoints();
   }
@@ -46,9 +45,8 @@ export default class ItemInfo extends HTMLElement {
         const player = this._endpoints.views.loadPlayer.replace(':sessionId', _id);
         const editSession = this._endpoints.views.editSession.replace(':sessionId', _id);
         const deleteSession = this._endpoints.session.delete.url.replace(':sessionId', _id);
-        return `<span>${_id} | <a href="${player}">player</a> |
-      <a href="${editSession}">edit</a></span> | 
-      <ajax-link url="${deleteSession}" session-id="${_id}" method="delete" label="delete"></ajax-link>`;
+        return `<span>${_id} | <a href="${player}">player</a> 
+        | <ajax-link url="${deleteSession}" session-id="${_id}" method="delete" label="delete"></ajax-link>`;
       }).join('<br/>');
 
       this._$sessions.innerHTML = markup;
