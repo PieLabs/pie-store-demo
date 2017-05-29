@@ -33,7 +33,6 @@ export default class PlayerControls extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log('connected');
     this.shadowRoot.querySelectorAll('button').forEach(n => {
       console.log('node: ', n);
       const id = n.getAttribute('id');
