@@ -10,9 +10,6 @@ const html = `
   |
   <button id="get-outcome">get outcome</button>
   <button id="get-status">status</button> 
-  | 
-  <button id="reset">reset</button>
-  <button id="reset-response">reset response</button>
 </span>
 `;
 

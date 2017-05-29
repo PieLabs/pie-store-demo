@@ -63,7 +63,7 @@ const init = () => {
           .then(s => {
             const ac = allComplete(s);
             controls.canSubmit = ac && !store().session.isComplete;
-            log.info('[response-changed] status: ', s);
+            log.info('[updateCanSubmit] status: ', s);
           });
       }
 
@@ -133,38 +133,6 @@ const init = () => {
           .catch(e => log.error(e));
       });
 
-
-      /**
-       * TODO: reset/resetResponse api - needs to change.
-       * We need a way to allow the context to apply or allow the changes that 
-       * happen to the model during a reset.
-       * Options:  
-       * 1. reset just returns the new model, the context can then use that to see if it's ok and if so, then apply it.
-       * 2. reset takes a predicate function: `resetOk(updatedModel) : Promise`, if the predicate fails then the change won't be applied internally in the player.
-       * 
-       * Note: that the context and the player share the same session instance.
-       */
-      document.addEventListener('player-controls.reset-response', e => {
-        player.resetResponse()
-          .then(() => client.updateSession(store().session, true))
-          .then(() => {
-            player.session = store().session.answers;
-            sessionEditor.session = store().session;
-            log.info('reset-response complete.');
-          })
-          .catch(e => log.error(e));
-      });
-
-      document.addEventListener('player-controls.reset', e => {
-        player.reset()
-          .then(() => client.updateSession(store().session, true))
-          .then(() => {
-            player.session = store().session.answers;
-            sessionEditor.session = store().session;
-            log.info('reset complete.');
-          })
-          .catch(e => log.error(e));
-      });
     });
 }
 
