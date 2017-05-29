@@ -15,6 +15,10 @@ To add:
 * bundle building from items
 * users/auth?
 * registration?
+* reset example
+* flesh out flows .. student/teacher
+* adding items - building items for use/rendering
+* storing temporal information?
 
 ## install 
 ```
