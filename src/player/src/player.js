@@ -44,51 +44,51 @@ const init = () => {
         _pieStore.session = s;
         sessionEditor.session = s;
         session.answers = s.answers || [];
-        player.session = s.answers;
+        player.sessions(s.answers);
       };
 
       updateSession(_pieStore.session);
 
       player.controller = controller;
-      player.env = env;
+      player.env(env);
 
-      player.addEventListener('pie.model-updated', e => {
+      player.addEventListener('model-updated', e => {
         console.log('model updated successfully', e);
       });
 
-      player.addEventListener('pie.model-update.error', e => {
-        console.log('model update failed', e);
-        log.error(e.detail.error);
-      });
 
-      player.addEventListener('status-changed', e => {
-        log.info('received status-changed', e.detail.statuses);
-      })
+      player.addEventListener('sessions-changed', e => {
+        log.info('received sessions-changed', e.detail.statuses);
+        sessionEditor.session = store().session;
+      });
 
       //from the session editor
       document.addEventListener('update-session', e => {
         client.updateSession(e.detail.session)
           .then(s => {
             env.mode = s.isComplete ? (env.mode === 'evaluate' ? 'evaluate' : 'view') : 'gather';
-            player.env = env;
-            updateSession(s);
+            player.env(env)
+              .then(() => {
+                updateSession(s);
+              })
+              .catch(e => log.error(e));
           })
-          .catch(e => console.log(e));
+          .catch(e => log.error(e));
       });
 
       //from the player control bar
       document.addEventListener('player-controls.switch-mode', e => {
         const { mode } = e.detail;
         env.mode = mode;
-        player.env = env;
+        player.env(env)
+          .catch(e => log.error(e));
       });
 
       document.addEventListener('player-controls.get-outcome', e => {
         const { env, session } = store();
 
-        player.getOutcome(session, env)
+        player.outcomes(session, env)
           .then(o => {
-            console.log('outcome: ', o);
             log.info('outcome', o);
           })
           .catch(e => {
@@ -112,7 +112,7 @@ const init = () => {
       document.addEventListener('player-controls.submit', e => {
         client.submit(_pieStore.session.answers)
           .then(({ env, session }) => {
-            player.env = env;
+            player.env(env);
             sessionEditor.session = session;
           })
           .catch(e => {

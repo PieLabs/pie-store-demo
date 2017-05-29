@@ -5,7 +5,7 @@ export default class PieController {
   constructor(private config: any, private controllerMap: any) { }
 
   public model(session: { id: string }[], env) {
-    return this.callComponentController('model', session, env)
+    return this.callComponentController('model', session, env);
   }
 
   public outcome(session: { id: string }[], env) {
