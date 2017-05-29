@@ -13,14 +13,14 @@ export default class PieController {
       .then(pies => {
         const weights = this.mkWeights();
         const summary = this.mkSummary(pies, weights);
-        return { summary, pies, weights }
+        return { summary, pies, weights };
       });
   }
 
   private mkSummary(pies: any[], weights: any[]) {
     const max = _(weights).map(w => w.weight).reduce((a, b) => a + b, 0);
     const min = 0;
-    const weight = (id) => (_.find(weights, w => w.id == id) || { weight: 1 }).weight;
+    const weight = (id) => (_.find(weights, w => w.id === id) || { weight: 1 }).weight;
     const rawScore = _(pies).map(p => {
       if (isNaN(p.score)) {
         throw new Error('score is not a number: ' + JSON.stringify(p));
@@ -28,20 +28,20 @@ export default class PieController {
         return p.score * weight(p.id);
       }
     }).reduce((a, b) => a + b, 0);
-    const score = rawScore.toFixed(2);
+    const score: number = parseFloat(rawScore.toFixed(2));
     const percentage = (score / max) * 100;
     return {
-      percentage,
-      min,
       max,
+      min,
+      percentage,
       score
-    }
+    };
   }
 
   private mkWeights() {
     const configWeights = _.cloneDeep(this.config.weights || []);
     _.forEach(this.config.models, m => {
-      if (!_.some(configWeights, w => w.id === m.id)) {
+      if (!_.some(configWeights, (w: any) => w.id === m.id)) {
         configWeights.push({ id: m.id, weight: 1 });
       }
     });

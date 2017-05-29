@@ -8,6 +8,7 @@ import PieStoreController from './pie-store-controller';
 import PlayerControls from './player-controls';
 import SessionClient from './session-client';
 import SessionEditor from './session-editor';
+import some from 'lodash/some';
 
 customElements.define('pie-player', PiePlayer);
 customElements.define('player-controls', PlayerControls);
@@ -43,7 +44,7 @@ const init = () => {
       const controls = document.querySelector('player-controls');
       const controller = new PieStoreController(endpoints);
 
-      const allComplete = (statuses) => !_.some(statuses, s => !s.complete);
+      const allComplete = (statuses) => !some(statuses, s => !s.complete);
 
       const updateSession = (s) => {
         _pieStore.session = s;
@@ -74,6 +75,7 @@ const init = () => {
       player.addEventListener('sessions-changed', e => {
         log.info('received sessions-changed', e.detail.statuses);
         sessionEditor.session = store().session;
+        updateCanSubmit();
       });
 
       //from the session editor

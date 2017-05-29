@@ -16,9 +16,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -1964,6 +1964,8 @@ module.exports = stubArray;
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["outcome"] = outcome;
+/* harmony export (immutable) */ __webpack_exports__["model"] = model;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_assign__ = __webpack_require__(163);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash_assign__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash_cloneDeep__ = __webpack_require__(164);
@@ -1979,8 +1981,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_lodash_map__ = __webpack_require__(171);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_lodash_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_lodash_map__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__scoring_js__ = __webpack_require__(180);
-/* harmony export (immutable) */ __webpack_exports__["outcome"] = outcome;
-/* harmony export (immutable) */ __webpack_exports__["model"] = model;
 
 
 
@@ -2018,9 +2018,11 @@ function outcome(question, session = { value: [] }) {
       reject(new Error('Question is missing required array: choices'));
     } else {
       const allCorrect = isResponseCorrect(question, session);
+      const correct = question.choices.filter(c => c.correct);
+
       resolve({
         score: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__scoring_js__["a" /* score */])(question, session),
-        complete: session.value.length >= question.choices.length
+        complete: session.value.length >= correct.length
       });
     }
   });
@@ -6184,9 +6186,9 @@ module.exports = values;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = score;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_isEqual__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_isEqual___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash_isEqual__);
-/* harmony export (immutable) */ __webpack_exports__["a"] = score;
 
 
 const maxScore = 1;
