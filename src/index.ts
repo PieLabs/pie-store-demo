@@ -41,7 +41,17 @@ bootstrap(opts)
 
     const { NODE_ENV } = process.env;
 
-    app.use('/', rootClient(services.items, services.sessions, env, stringToObjectID));
+    const authMiddleware = (req, res, next) => {
+      //TODO: hookup auth..
+      next();
+    }
+
+    app.use('/', rootClient(
+      services.items,
+      services.sessions,
+      authMiddleware,
+      env,
+      stringToObjectID));
     app.use('/player', player(
       services.items,
       services.sessions,

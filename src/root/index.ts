@@ -15,6 +15,7 @@ const logger = buildLogger();
 export default function <ID>(
   itemService: ItemService<ID>,
   sessionService: SessionService<ID>,
+  authenticate: (req: express.Request, res: express.Response, next: express.NextFunction) => void,
   env: 'dev' | 'prod',
   stringToId: (id: string) => ID): express.Application {
 
@@ -44,19 +45,22 @@ export default function <ID>(
 
   const parse = parseId.bind(null, stringToId);
 
-  app.get('/', (req, res, next) => {
-    itemService.list({})
-      .then(items => {
-        const cleaned = items.map((i: any) => ({
-          _id: i._id.toHexString()
-        }))
-        logger.silly('cleaned: ', cleaned);
-        res.render('index', {
-          items: cleaned
-        });
-      })
-      .catch(next);
-  });
+  app.get('/',
+    authenticate,
+    (req, res, next) => {
+      const { username } = (req as any);
+      itemService.listForUsername(username)
+        .then(items => {
+          const cleaned = items.map((i: any) => ({
+            _id: i._id.toHexString()
+          }))
+          logger.silly('cleaned: ', cleaned);
+          res.render('index', {
+            items: cleaned
+          });
+        })
+        .catch(next);
+    });
 
   app.get('/items/:itemId', (req, res, next) => {
     const { itemId } = req.params;

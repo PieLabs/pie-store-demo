@@ -1,6 +1,6 @@
 import { Db, MongoClient, ObjectID } from 'mongodb';
 import { FileService, LocalFileService, S3Service } from './player/file-service';
-import { ItemService, MongoItemService, MongoSessionService, SessionService } from './services';
+import { ItemService, MongoItemService, MongoSessionService, MongoUserService, SessionService, UserService } from './services';
 
 import { ControllerCache } from './player/controller/cache';
 import { S3 } from 'aws-sdk';
@@ -13,7 +13,8 @@ export type Services<ID> = {
   items: ItemService<ID>,
   sessions: SessionService<ID>,
   file: FileService,
-  controllerCache: ControllerCache
+  controllerCache: ControllerCache,
+  users: UserService
 }
 
 export type BootstrapOpts = {
@@ -36,7 +37,8 @@ export async function bootstrap(opts: BootstrapOpts): Promise<Services<ObjectID>
     new LocalFileService(join(process.cwd(), 'seed/dev/items'));
 
   const controllerCache = new ControllerCache(file);
-  return { items, sessions, file, controllerCache };
+  const users = await MongoUserService.build(db.collection('users'));
+  return { items, sessions, file, controllerCache, users };
 }
 
 export function buildOpts(args: any, env: any): BootstrapOpts {
