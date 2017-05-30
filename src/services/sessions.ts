@@ -6,7 +6,7 @@ const logger = buildLogger();
 
 export interface SessionService<ID> {
   listForItem(itemId: ID): Promise<any[]>;
-  createForItem(itemId: ID): Promise<{}>;
+  createForItem(itemId: ID, extras: any): Promise<{}>;
   update(id: ID, session: any): Promise<{}>;
   delete(id: ID): Promise<boolean>;
   findById(id: ID): Promise<any>;
@@ -26,12 +26,12 @@ export class MongoSessionService implements SessionService<ObjectID> {
     return this.collection.findOne({ _id });
   }
 
-  public createForItem(itemId: ObjectID): Promise<{}> {
-    const session = {
+  public createForItem(itemId: ObjectID, extras: any): Promise<{}> {
+    const session = _.merge(extras, {
       _id: new ObjectID(),
-      itemId,
-      isComplete: false
-    };
+      isComplete: false,
+      itemId
+    });
 
     return this.collection.insertOne(session)
       .then(result => {

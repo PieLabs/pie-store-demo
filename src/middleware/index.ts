@@ -3,11 +3,10 @@ import { staticFiles as gzipStaticFiles } from './gzip';
 
 const logger = buildLogger();
 
-
 export { gzipStaticFiles };
 
-/** 
- * TODO: Add type support 
+/**
+ * TODO: Add type support
  */
 export const parseId = <ID>(stringToId: (id: string) => ID,
   key: string, req, res, next) => {
@@ -27,4 +26,4 @@ export const parseId = <ID>(stringToId: (id: string) => ID,
       next();
     }
   }
-}
+};

@@ -1,6 +1,13 @@
 import { Db, MongoClient, ObjectID } from 'mongodb';
 import { FileService, LocalFileService, S3Service } from './player/file-service';
-import { ItemService, MongoItemService, MongoSessionService, MongoUserService, SessionService, UserService } from './services';
+import {
+  ItemService,
+  MongoItemService,
+  MongoSessionService,
+  MongoUserService,
+  SessionService,
+  UserService,
+} from './services';
 
 import { ControllerCache } from './player/controller/cache';
 import { S3 } from 'aws-sdk';
@@ -14,8 +21,8 @@ export type Services<ID> = {
   sessions: SessionService<ID>,
   file: FileService,
   controllerCache: ControllerCache,
-  users: UserService
-}
+  users: UserService<ID>
+};
 
 export type BootstrapOpts = {
   s3?: {
@@ -46,7 +53,6 @@ export function buildOpts(args: any, env: any): BootstrapOpts {
     bucket: args.bucket || env.S3_BUCKET,
     prefix: args.prefix || env.S3_PREFIX
   };
-
 
   const mongoUri = args.mongoUri || env.MONGO_URI || 'mongodb://localhost:27017/pie-store-demo';
 

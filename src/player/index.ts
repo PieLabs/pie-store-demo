@@ -17,7 +17,6 @@ import { json } from 'body-parser';
 
 const logger = buildLogger();
 
-
 const markdown = (p: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     readFile(p, 'utf8', (err, md) => {
@@ -65,18 +64,29 @@ export default function mkApp<ID>(
   } else {
     // TODO...
     const dir = join(__dirname, '../../lib/player/public');
-    // try and find the .gz version of the file and update the headers accordingly 
+    // try and find the .gz version of the file
+    // and update the headers accordingly
     app.use(gzipStaticFiles(dir));
     app.use(express.static(dir));
   }
 
-
   const addSessionId = parseId.bind(null, stringToId, 'sessionId');
   const addItemId = parseId.bind(null, stringToId, 'itemId');
 
-  app.post('/:itemId/register', (req, res, next) => {
-    res.send('?');
-  });
+  app.post('/:itemId/register',
+    addItemId,
+    (req: any, res, next) => {
+      res.send('?');
+      sessionService.createForItem(req.itemId, {
+        student: req.body.name
+      })
+        .then((session: any) => {
+          res.json({ url: `/player/${session._id}` });
+        })
+        .catch(e => {
+          res.json({ error: 'an error occured' });
+        });
+    });
 
   app.get('/:itemId/partake', (req, res, next) => {
     res.render('partake', {
@@ -133,12 +143,12 @@ export default function mkApp<ID>(
       const playerNotes = await markdown(join(__dirname, 'player-notes.md'));
 
       res.render('player', {
-        playerNotes,
-        env: { mode },
-        session,
         endpoints,
+        env: { mode },
         js: [`/player/${session.itemId}/pie-view.js`],
-        markup: item.markup
+        markup: item.markup,
+        playerNotes,
+        session,
       });
     });
 
@@ -152,13 +162,12 @@ export default function mkApp<ID>(
       rs.pipe(res);
     });
 
-
   const addSavedSession = async (req, res, next) => {
     const { session, env } = req.body;
     logger.silly('sessionId: ', req.sessionId);
     req.savedSession = await sessionService.findById(req.sessionId);
     next();
-  }
+  };
 
   app.post('/:sessionId/model',
     addSessionId,
@@ -204,7 +213,7 @@ export default function mkApp<ID>(
     (req: any, res, next) => {
       const { session } = req.body;
       if (req.savedSession.isComplete) {
-        res.status(400).json({ error: `Can't update if the session is complete` })
+        res.status(400).json({ error: `Can't update if the session is complete` });
       } else {
         sessionService.update(req.sessionId, session)
           .then(updated => {
