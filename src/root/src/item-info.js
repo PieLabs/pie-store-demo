@@ -21,6 +21,9 @@ export default class ItemInfo extends HTMLElement {
   constructor() {
     super();
     let sr = applyStyle(this, template);
+    /**
+     * Need to render player in the light dom.
+     */
     this.innerHTML = `<session-preview></session-preview>`;
     this._$actions = sr.querySelector('.actions');
     this._$sessionListing = sr.querySelector('session-listing');
