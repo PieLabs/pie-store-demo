@@ -74,6 +74,21 @@ export default function mkApp<ID>(
   const addSessionId = parseId.bind(null, stringToId, 'sessionId');
   const addItemId = parseId.bind(null, stringToId, 'itemId');
 
+  app.post('/:itemId/register', (req, res, next) => {
+    res.send('?');
+  });
+
+  app.get('/:itemId/partake', (req, res, next) => {
+    res.render('partake', {
+      endpoints: {
+        registerStudent: {
+          method: 'POST',
+          url: 'register'
+        }
+      }
+    });
+  });
+
   app.get('/:sessionId',
     addSessionId,
     async (req: any, res, next) => {

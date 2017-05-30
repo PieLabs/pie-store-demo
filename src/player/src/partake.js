@@ -1,8 +1,8 @@
 require('../../client-common/common');
 
-console.log('login!');
+import StudentIdForm from './student-id-form';
 
-
+customElements.define('student-id-form', StudentIdForm);
 
 const init = () => {
   const container = document.querySelector('catalog-container');

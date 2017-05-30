@@ -1,0 +1,21 @@
+doctype html 
+html 
+  head
+    title take 
+    link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
+
+    style.
+      h5 {
+        font-family: 'Roboto', sans-serif;
+      } 
+
+    script.
+       window._pieStore = {};
+       window._pieStore.endpoints = !{ endpoints ? JSON.stringify(endpoints) : '{}'};
+
+  body
+    catalog-container
+      span(slot="header") Pie Demo Store 
+      student-id-form
+    
+    script(src="../partake.js")

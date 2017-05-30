@@ -7,6 +7,7 @@ module.exports = {
   context: path.join(__dirname),
   entry: {
     player: './src/player.js',
+    partake: './src/partake.js'
   },
   output: {
     publicPath: '/player',

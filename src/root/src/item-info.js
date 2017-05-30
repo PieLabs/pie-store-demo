@@ -73,9 +73,12 @@ export default class ItemInfo extends HTMLElement {
     let markup = ``;
 
     const { create } = this._endpoints.session;
+    const { partake } = this._endpoints.views;
     const url = create.url.replace(':itemId', this._item._id);
     const el = `<ajax-link label="create" method="${create.method}" url="${url}"></ajax-link>`;
     markup += el;
+
+    markup += `<a href="${partake.replace(':itemId', this._item._id)}" target="_blank">Take Test</a>`;
 
     this._$actions.innerHTML = markup;
 

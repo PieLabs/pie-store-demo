@@ -85,47 +85,57 @@ export default function <ID>(
       'local',
       { failureRedirect: '/login', successReturnToOrRedirect: '/' }));
 
-  app.get('/items/:itemId', (req, res, next) => {
-    const { itemId } = req.params;
-    const oid = stringToId(itemId);
 
-    sessionService.listForItem(oid)
-      .then(sessions => {
+  // TODO: implement
+  const ensureOwnsItem = (req, res, next) => {
+    next();
+  };
 
-        const endpoints = {
-          session: {
-            create: {
-              method: 'POST',
-              url: `/api/sessions/item/:itemId`,
+  app.get('/items/:itemId',
+    ensureLoggedIn('/login'),
+    ensureOwnsItem,
+    (req, res, next) => {
+      const { itemId } = req.params;
+      const oid = stringToId(itemId);
+
+      sessionService.listForItem(oid)
+        .then(sessions => {
+
+          const endpoints = {
+            session: {
+              create: {
+                method: 'POST',
+                url: `/api/sessions/item/:itemId`,
+              },
+              delete: {
+                method: 'DELETE',
+                url: `/api/sessions/:sessionId`
+              },
+              list: {
+                method: 'GET',
+                url: `/api/sessions/item/:itemId`
+              }
             },
-            delete: {
-              method: 'DELETE',
-              url: `/api/sessions/:sessionId`
-            },
-            list: {
-              method: 'GET',
-              url: `/api/sessions/item/:itemId`
+            views: {
+              editSession: '/session/:sessionId',
+              loadPlayer: '/player/:sessionId',
+              partake: '/player/:itemId/partake'
             }
-          },
-          views: {
-            editSession: '/session/:sessionId',
-            loadPlayer: '/player/:sessionId'
-          }
-        };
+          };
 
-        if (oid) {
-          itemService.findById(oid)
-            .then((item: any) => {
-              item.sessions = sessions || [];
-              res.render('item', { item, endpoints });
-            })
-            .catch(e => next);
-        } else {
-          next(new Error('Invalid Item id: ' + req.params.itemId));
-        }
-      })
-      .catch(next);
-  });
+          if (oid) {
+            itemService.findById(oid)
+              .then((item: any) => {
+                item.sessions = sessions || [];
+                res.render('item', { item, endpoints });
+              })
+              .catch(e => next);
+          } else {
+            next(new Error('Invalid Item id: ' + req.params.itemId));
+          }
+        })
+        .catch(next);
+    });
 
   return app;
 }
