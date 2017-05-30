@@ -1,5 +1,8 @@
 import * as _ from 'lodash';
 
+import { buildLogger } from 'log-factory';
+
+const logger = buildLogger();
 export default class PieController {
 
   constructor(private config: any, private controllerMap: any) { }
@@ -49,6 +52,9 @@ export default class PieController {
   }
 
   private callComponentController(fnName, session, env) {
+
+    logger.debug('session: ', JSON.stringify(session, null, '  '));
+
     const toData = (model) => {
 
       if (!model.element || !model.id) {
@@ -68,6 +74,7 @@ export default class PieController {
 
       const modelFn = this.controllerMap[data.element][fnName] || failed;
 
+      logger.debug('data: ', JSON.stringify(data, null, '  '));
       return modelFn(data.model, data.session, env)
         .then(result => {
           result.id = data.id;

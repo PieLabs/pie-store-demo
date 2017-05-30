@@ -2,12 +2,18 @@ import { AjaxFailedEvent, AjaxResultEvent } from './ajax-link';
 import { applyStyle, prepareTemplate } from 'pie-catalog-client/src/styles';
 
 const html = `
-<div>Item Info </div>
-<h4>Sessions</h4>
-<div id="sessions">no sessions</div>
-<hr/>
-<span id="session-actions">
-</span>`;
+<style> 
+  .main {
+    display: flex;
+  }
+</style>
+<div class="main">
+<session-listing></session-listing>
+<slot>
+</slot>
+</div>
+<div class="actions">
+</div>`;
 
 const template = prepareTemplate(html, 'item-info');
 
@@ -15,19 +21,28 @@ export default class ItemInfo extends HTMLElement {
   constructor() {
     super();
     let sr = applyStyle(this, template);
-    this._$actions = sr.querySelector('#session-actions');
-    this._$sessions = sr.querySelector('#sessions');
+    this.innerHTML = `<session-preview></session-preview>`;
+    this._$actions = sr.querySelector('.actions');
+    this._$sessionListing = sr.querySelector('session-listing');
+    this._$sessionPreview = this.querySelector('session-preview');
+    this._$sessionListing.addEventListener('show-session', e => {
+      this._$sessionPreview.showSession(e.detail.session);
+    });
   }
 
   set item(i) {
     this._item = i;
+    this._$sessionPreview.item = this._item;
     this._render();
   }
 
   set endpoints(e) {
     this._endpoints = e;
+    this._$sessionPreview.endpoints = e;
     this._render();
   }
+
+
 
   _render() {
     this._renderSessions();
@@ -39,29 +54,7 @@ export default class ItemInfo extends HTMLElement {
       return;
     }
 
-    if (this._item.sessions.length > 0) {
-      let markup = this._item.sessions.map((s) => {
-        const { _id } = s;
-        const player = this._endpoints.views.loadPlayer.replace(':sessionId', _id);
-        const editSession = this._endpoints.views.editSession.replace(':sessionId', _id);
-        const deleteSession = this._endpoints.session.delete.url.replace(':sessionId', _id);
-        return `<span>${_id} | <a href="${player}">player</a> 
-        | <ajax-link url="${deleteSession}" session-id="${_id}" method="delete" label="delete"></ajax-link>`;
-      }).join('<br/>');
-
-      this._$sessions.innerHTML = markup;
-
-      this._$sessions.querySelectorAll('ajax-link').forEach(el => {
-        el.addEventListener(AjaxResultEvent.TYPE(), (event) => {
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          const id = event.target.getAttribute('session-id');
-          const index = this._item.sessions.findIndex(o => o._id === id);
-          this._item.sessions.splice(index, 1);
-          this._renderSessions();
-        });
-      })
-    }
+    this._$sessionListing.sessions = this._item.sessions;
   }
 
   _renderEndpoints() {
@@ -72,13 +65,8 @@ export default class ItemInfo extends HTMLElement {
 
     let markup = ``;
 
-    const { create } = this._endpoints.session;
     const { partake } = this._endpoints.views;
-    const url = create.url.replace(':itemId', this._item._id);
-    const el = `<ajax-link label="create" method="${create.method}" url="${url}"></ajax-link>`;
-    markup += el;
-
-    markup += `<a href="${partake.replace(':itemId', this._item._id)}" target="_blank">Take Test</a>`;
+    markup += `<a href="${partake.replace(':itemId', this._item._id)}" target="_blank">test url to share</a>`;
 
     this._$actions.innerHTML = markup;
 

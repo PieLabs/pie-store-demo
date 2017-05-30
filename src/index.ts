@@ -66,6 +66,7 @@ bootstrap(opts)
     app.use('/', rootClient(
       services.items,
       services.sessions,
+      services.file,
       mw,
       env,
       stringToObjectID));
@@ -77,7 +78,7 @@ bootstrap(opts)
       services.controllerCache,
       env,
       stringToObjectID));
-    app.use('/api', api(services.items, services.sessions, stringToObjectID));
+    app.use('/api', api(services.items, services.controllerCache, services.sessions, stringToObjectID));
 
     const server = http.createServer(app);
 

@@ -8,6 +8,7 @@ import { createReadStream, stat } from 'fs-extra';
 import { gzipStaticFiles, parseId } from '../middleware';
 import { join, resolve } from 'path';
 
+import { FileService } from './../player/file-service/api';
 import { ObjectID } from 'mongodb';
 import { buildLogger } from 'log-factory';
 import { ensureLoggedIn } from 'connect-ensure-login';
@@ -17,6 +18,7 @@ const logger = buildLogger();
 export default function <ID>(
   itemService: ItemService<ID>,
   sessionService: SessionService<ID>,
+  fileService: FileService,
   authenticate: (req: express.Request, res: express.Response, next: express.NextFunction) => void,
   env: 'dev' | 'prod',
   stringToId: (id: string) => ID): express.Application {
@@ -39,7 +41,7 @@ export default function <ID>(
     app.use(middleware);
   } else {
     const dir = join(__dirname, '../../lib/root/public');
-    // try and find the .gz version of the file and update the headers accordingly 
+    // try and find the .gz version of the file and update the headers accordingly
     app.use(gzipStaticFiles(dir));
     app.use(express.static(dir));
   }
@@ -85,11 +87,23 @@ export default function <ID>(
       'local',
       { failureRedirect: '/login', successReturnToOrRedirect: '/' }));
 
-
   // TODO: implement
   const ensureOwnsItem = (req, res, next) => {
     next();
   };
+
+  const addItemId = parseId.bind(null, stringToId, 'itemId');
+
+  app.get('/:itemId/pie-view.js',
+    addItemId,
+    async (req: any, res, next) => {
+      const item = await itemService.findById(req.itemId);
+      logger.info('itemId: ', req.itemId);
+      const { rs, size } = await fileService.streamAndSize(item.paths.view);
+      res.setHeader('Content-Type', 'application/javascript');
+      res.setHeader('Content-Length', size.toString());
+      rs.pipe(res);
+    });
 
   app.get('/items/:itemId',
     ensureLoggedIn('/login'),
@@ -102,32 +116,28 @@ export default function <ID>(
         .then(sessions => {
 
           const endpoints = {
+            model: {
+              method: 'POST',
+              url: `/api/items/${itemId}/model`
+            },
             session: {
-              create: {
-                method: 'POST',
-                url: `/api/sessions/item/:itemId`,
-              },
               delete: {
                 method: 'DELETE',
                 url: `/api/sessions/:sessionId`
-              },
-              list: {
-                method: 'GET',
-                url: `/api/sessions/item/:itemId`
               }
             },
             views: {
               editSession: '/session/:sessionId',
-              loadPlayer: '/player/:sessionId',
               partake: '/player/:itemId/partake'
             }
           };
+          const js = [`/${itemId}/pie-view.js`];
 
           if (oid) {
             itemService.findById(oid)
               .then((item: any) => {
                 item.sessions = sessions || [];
-                res.render('item', { item, endpoints });
+                res.render('item', { item, endpoints, js });
               })
               .catch(e => next);
           } else {
@@ -139,4 +149,3 @@ export default function <ID>(
 
   return app;
 }
-

@@ -10,7 +10,7 @@ export class ControllerCache {
     this.mapCache = {};
   }
 
-  public async load(itemId: string, item: any, path: string): Promise<any> {
+  public async load(itemId: string, item: any, path: string): Promise<Controller> {
     const controllerMap = await this.getControllerMap(itemId, path);
     return new Controller(item, controllerMap);
   }
