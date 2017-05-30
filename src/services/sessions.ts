@@ -1,12 +1,16 @@
+// tslint:disable:variable-name
+import * as _ from 'lodash';
+
 import { Collection, ObjectID } from 'mongodb';
 
+import { SessionService } from './sessions';
 import { buildLogger } from 'log-factory';
 
 const logger = buildLogger();
 
 export interface SessionService<ID> {
   listForItem(itemId: ID): Promise<any[]>;
-  createForItem(itemId: ID, extras: any): Promise<{}>;
+  createForItem(itemId: ID, studentId: string): Promise<{}>;
   update(id: ID, session: any): Promise<{}>;
   delete(id: ID): Promise<boolean>;
   findById(id: ID): Promise<any>;
@@ -15,8 +19,17 @@ export interface SessionService<ID> {
 
 export class MongoSessionService implements SessionService<ObjectID> {
 
-
-  constructor(private collection: Collection) { }
+  public static build(collection: Collection): Promise<SessionService<ObjectID>> {
+    return (collection as any).ensureIndex({
+      itemId: 1,
+      studentId: 1
+    },
+      { unique: true }).then(() => {
+        return new MongoSessionService(collection);
+      });
+  }
+  private constructor(private collection: Collection) {
+  }
 
   public listForItem(itemId: ObjectID): Promise<{}[]> {
     return this.collection.find({ itemId }).toArray();
@@ -26,17 +39,29 @@ export class MongoSessionService implements SessionService<ObjectID> {
     return this.collection.findOne({ _id });
   }
 
-  public createForItem(itemId: ObjectID, extras: any): Promise<{}> {
-    const session = _.merge(extras, {
-      _id: new ObjectID(),
-      isComplete: false,
-      itemId
-    });
+  public createForItem(itemId: ObjectID, studentId: string): Promise<{}> {
 
-    return this.collection.insertOne(session)
-      .then(result => {
-        return session._id;
-      });
+    return this.collection.findOne({
+      itemId,
+      studentId
+    }).then(dbSession => {
+      if (dbSession === null) {
+        const session = {
+          _id: new ObjectID(),
+          isComplete: false,
+          itemId,
+          studentId
+        };
+
+        return this.collection.insertOne(session)
+          .then(result => {
+            return session;
+          });
+
+      } else {
+        return dbSession;
+      }
+    });
   }
 
   public update(_id: ObjectID, session: any): Promise<any> {

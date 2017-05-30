@@ -36,7 +36,7 @@ export async function bootstrap(opts: BootstrapOpts): Promise<Services<ObjectID>
   const { s3, mongoUri } = opts;
   const db = await MongoClient.connect(mongoUri);
   const items: ItemService<ObjectID> = new MongoItemService(db.collection('items'));
-  const sessions: SessionService<ObjectID> = new MongoSessionService(db.collection('sessions'));
+  const sessions: SessionService<ObjectID> = await MongoSessionService.build(db.collection('sessions'));
   const client = new S3();
 
   const file = (s3.bucket && s3.prefix) ?

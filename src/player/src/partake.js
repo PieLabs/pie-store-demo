@@ -1,5 +1,11 @@
 require('../../client-common/common');
 
+import {
+  jsonHeaders as headers,
+  json,
+  status,
+} from '../../client-common/fetch-helpers';
+
 import StudentIdForm from './student-id-form';
 
 customElements.define('student-id-form', StudentIdForm);
@@ -16,9 +22,10 @@ const init = () => {
         const { registerStudent } = _pieStore.endpoints;
         const opts = {
           method: registerStudent.method,
-          body: {
+          headers,
+          body: JSON.stringify({
             name: e.detail.name
-          }
+          })
         }
 
         fetch(registerStudent.url, opts)

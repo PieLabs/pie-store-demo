@@ -76,11 +76,10 @@ export default function mkApp<ID>(
   app.post('/:itemId/register',
     addItemId,
     (req: any, res, next) => {
-      res.send('?');
-      sessionService.createForItem(req.itemId, {
-        student: req.body.name
-      })
+      logger.info('req.body: ', req.body);
+      sessionService.createForItem(req.itemId, req.body.name)
         .then((session: any) => {
+          logger.info(`session: `, JSON.stringify(session));
           res.json({ url: `/player/${session._id}` });
         })
         .catch(e => {

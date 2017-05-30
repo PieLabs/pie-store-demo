@@ -26,13 +26,13 @@ export default function <ID>(
       .catch(next);
   });
 
-  app.post('/item/:itemId', parse.bind(null, 'itemId'), (req: any, res, next) => {
-    sessionService.createForItem(req.itemId)
-      .then((id) => {
-        res.status(201).json({ _id: id, itemId: req.itemId });
-      })
-      .catch(next);
-  });
+  // app.post('/item/:itemId', parse.bind(null, 'itemId'), (req: any, res, next) => {
+  //   sessionService.createForItem(req.itemId, {})
+  //     .then((id) => {
+  //       res.status(201).json({ _id: id, itemId: req.itemId });
+  //     })
+  //     .catch(next);
+  // });
 
   app.delete('/:sessionId', parse.bind(null, 'sessionId'), (req: any, res, next) => {
     logger.silly(':sessionId: ', req.sessionId);
