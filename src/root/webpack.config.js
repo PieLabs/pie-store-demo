@@ -6,6 +6,7 @@ module.exports = {
   context: path.join(__dirname),
   entry: {
     index: './src/index.js',
+    login: './src/login.js',
     item: './src/item.js'
   },
   output: {

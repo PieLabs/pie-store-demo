@@ -14,8 +14,8 @@ export class MongoItemService implements ItemService<ObjectID> {
 
   constructor(private collection: Collection) { }
 
-  public list(query: any, skip: number = 0, limit: number = 50): Promise<{}[]> {
-    return this.collection.find({}).skip(skip).limit(limit).toArray();
+  public list(query: any = {}, skip: number = 0, limit: number = 50): Promise<{}[]> {
+    return this.collection.find(query).skip(skip).limit(limit).toArray();
   }
 
   public listForUsername(username: string, skip: number = 0, limit: number = 0) {

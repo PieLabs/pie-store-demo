@@ -1,4 +1,5 @@
 import * as express from 'express';
+import * as passport from 'passport';
 import * as webpack from 'webpack';
 import * as webpackMiddleware from 'webpack-dev-middleware';
 
@@ -9,6 +10,7 @@ import { join, resolve } from 'path';
 
 import { ObjectID } from 'mongodb';
 import { buildLogger } from 'log-factory';
+import { ensureLoggedIn } from 'connect-ensure-login';
 
 const logger = buildLogger();
 
@@ -42,18 +44,19 @@ export default function <ID>(
     app.use(express.static(dir));
   }
 
-
   const parse = parseId.bind(null, stringToId);
 
   app.get('/',
-    authenticate,
+    ensureLoggedIn('/login'),
     (req, res, next) => {
-      const { username } = (req as any);
+      logger.info('logged in...');
+      const { username } = req.user;
+      logger.debug('username: ', username);
       itemService.listForUsername(username)
         .then(items => {
           const cleaned = items.map((i: any) => ({
             _id: i._id.toHexString()
-          }))
+          }));
           logger.silly('cleaned: ', cleaned);
           res.render('index', {
             items: cleaned
@@ -61,6 +64,26 @@ export default function <ID>(
         })
         .catch(next);
     });
+
+  app.get('/settings',
+    ensureLoggedIn('/login'),
+    (req, res, next) => {
+      res.send('settings...');
+    });
+
+  app.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
+  });
+
+  app.get('/login', (req, res, next) => {
+    res.render('login', { error: req.flash('loginError') });
+  });
+
+  app.post('/login',
+    passport.authenticate(
+      'local',
+      { failureRedirect: '/login', successReturnToOrRedirect: '/' }));
 
   app.get('/items/:itemId', (req, res, next) => {
     const { itemId } = req.params;

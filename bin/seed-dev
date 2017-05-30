@@ -110,19 +110,37 @@ const builtItems = buildAndReadItems([
   '../seed/dev/items/one',
 ]);
 
+const rmUsers = (db) => {
+  const coll = db.collection('users');
+
+  if (coll) {
+    return coll.drop().then(() => db)
+      .catch(() => db);
+  } else {
+    return db;
+  }
+}
+
+const seedUsers = (db) => {
+  return db.collection('users').insert(
+    { username: 'ed', password: 'ed' }
+  ).then(() => db);
+}
 
 Promise.all(builtItems)
   .then(items => {
 
     console.log('items: ', items);
 
-    const seedItems = (c) => {
+    const seedItems = (db) => {
+      const collection = db.collection('items');
       return Promise.all(items.map(i => {
-        return c.insert(i)
+        i.username = 'ed';
+        return collection.insert(i)
           .then(() => {
             console.log('inserted: ', i);
           });
-      }));
+      })).then(() => db);
     };
 
     mongo.MongoClient.connect(uri)
@@ -132,9 +150,11 @@ Promise.all(builtItems)
         const collection = db.collection('items');
         return db.collection('sessions').remove({})
           .then(() => collection.remove({}))
-          .then(() => collection);
+          .then(() => db);
       })
       .then(seedItems)
+      .then(rmUsers)
+      .then(seedUsers)
       .then(() => {
         process.exit(0);
       })
