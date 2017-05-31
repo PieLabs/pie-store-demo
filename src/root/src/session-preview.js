@@ -13,9 +13,21 @@ const html = `
   cursor: pointer;
   color: blue;
 }
+.student{
+  font-size: 24px;
+  border-bottom: solid 1px var(--catalog-header-bg, blue);
+  padding-bottom: 10px;
+}
+
+pie-player{
+  display: block; 
+  padding-top: 10px;
+  margin-top: 10px;
+}
 
 </style>
-<div>Session preview</div>
+<div class="student" hidden></div>
+
 <pie-player></pie-player>
 `;
 
@@ -26,11 +38,7 @@ export default class SessionPreview extends HTMLElement {
     super();
     applyStyle(this, template, false);
     this._$player = this.querySelector('pie-player');
-    customElements.whenDefined('pie-player')
-      .then(() => {
-        this._$player.env({ mode: 'evaluate' });
-
-      });
+    this._$student = this.querySelector('.student');
   }
 
   set item(i) {
@@ -44,14 +52,22 @@ export default class SessionPreview extends HTMLElement {
   }
 
   showSession(s) {
+
+    if (s) {
+      this._$student.removeAttribute('hidden');
+    } else {
+      this._$student.setAttribute('hidden', '');
+    }
+
     if (!this.controller) {
       return;
     }
 
-    this._$player.sessions(s.answers)
-    // .then(() => {
-    //   this._$player.env({ mode: 'evaluate' });
-    // });
+    this._$student.textContent = s.studentId;
+    this._$player.env({ mode: s.isComplete ? 'evaluate' : 'view' })
+      .then(() => {
+        this._$player.sessions(s.answers);
+      });
   }
 
 }

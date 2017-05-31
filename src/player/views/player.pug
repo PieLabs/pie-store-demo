@@ -5,6 +5,13 @@ html
     link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
 
     style.
+
+      html{
+        /* --color-primary: color(rgba(0,40,80,0.9) a(20%)); */
+        --color-primary: color(rgba(0,40,80,0.9) a(20%));
+        --catalog-header-bg: var(--color-primary);
+      }
+
       h5 {
         font-family: 'Roboto', sans-serif;
       } 
@@ -17,26 +24,15 @@ html
 
   body
     catalog-container 
-      span(slot="header") Pie Demo TDS 
-
-        
+      span(slot="header") Player 
       h-pane     
         div 
-          h5 player
-          div The controls below have constraints applied to them, which prevent certain changes being made. 
           pie-player
             | !{markup}  
-          player-controls
-          error-log
-        div 
-          h5 session editor
-          div You can make any edits you want to the session here, without any constraints.
-          session-editor
-
-      div 
-        
-        | !{playerNotes}
+          simple-player-controls
+          session-outcome
 
     script(src="player.js")
+    
     for j in js 
       script(src=j, type="text/javascript")

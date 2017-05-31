@@ -98,6 +98,59 @@ export default function mkApp<ID>(
     });
   });
 
+  app.get('/:sessionId/super-user',
+    addSessionId,
+    async (req: any, res, next) => {
+      logger.silly('sessionId:', req.sessionId);
+
+      logger.silly('query: ', req.query);
+
+      const endpoints = {
+        model: {
+          method: 'POST',
+          url: `../${req.sessionId}/model`
+        },
+        outcome: {
+          method: 'POST',
+          url: `../${req.sessionId}/outcome`
+        },
+        submit: {
+          method: 'PUT',
+          url: `../${req.sessionId}/submit`
+        },
+        update: {
+          method: 'PUT',
+          url: `../${req.sessionId}/update`
+        },
+        updateWithConstraints: {
+          method: 'PUT',
+          url: `../${req.sessionId}/update-with-constraints`
+        }
+      };
+
+      const session = await sessionService.findById(req.sessionId);
+      const item = await itemService.findById(session.itemId);
+
+      // trigger load of controller
+      controllerCache.load(item.id, item, item.paths.controllers);
+
+      logger.silly('session: ', JSON.stringify(session));
+
+      const requestedMode = req.query.mode;
+
+      const mode = session.isComplete ? (requestedMode === 'evaluate' ? 'evaluate' : 'view') : 'gather';
+      const playerNotes = await markdown(join(__dirname, 'player-notes.md'));
+
+      res.render('super-player', {
+        endpoints,
+        env: { mode },
+        js: [`/player/${session.itemId}/pie-view.js`],
+        markup: item.markup,
+        playerNotes,
+        session,
+      });
+    });
+
   app.get('/:sessionId',
     addSessionId,
     async (req: any, res, next) => {

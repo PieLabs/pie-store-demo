@@ -3,8 +3,20 @@ import { applyStyle, prepareTemplate } from 'pie-catalog-client/src/styles';
 
 const html = `
 <style> 
+  :host{
+    display: block;
+    width: 100%;
+  }
   .main {
     display: flex;
+    width: 100%;
+  }
+
+  session-listing{
+    flex: 1;
+  }
+  ::slotted(session-preview){
+    flex: 1;
   }
 </style>
 <div class="main">

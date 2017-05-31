@@ -4,12 +4,19 @@ import { applyStyle, prepareTemplate } from 'pie-catalog-client/src/styles';
 const html = `
 <style>
 :host{
-  display: flex;
+  display: block;
+  width: 100%;
 }
 
 .action{
   cursor: pointer;
   color: blue;
+}
+table{
+  width: 100%;
+}
+th{
+  text-align: left;
 }
 </style>
 <table>
