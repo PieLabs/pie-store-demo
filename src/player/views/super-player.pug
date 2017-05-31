@@ -1,0 +1,42 @@
+doctype html 
+html 
+  head
+    title pie-demo-store 
+    link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
+
+    style.
+      h5 {
+        font-family: 'Roboto', sans-serif;
+      } 
+
+    script.
+       window._pieStore = {};
+       window._pieStore.env = !{ env ? JSON.stringify(env) : {}};
+       window._pieStore.session = !{ session ? JSON.stringify(session) : {}};
+       window._pieStore.endpoints = !{ endpoints ? JSON.stringify(endpoints) : {}};
+
+  body
+    catalog-container 
+      span(slot="header") Pie Demo TDS 
+
+        
+      h-pane     
+        div 
+          h5 player
+          div The controls below have constraints applied to them, which prevent certain changes being made. 
+          pie-player
+            | !{markup}  
+          player-controls
+          error-log
+        div 
+          h5 session editor
+          div You can make any edits you want to the session here, without any constraints.
+          session-editor
+
+      div 
+        
+        | !{playerNotes}
+
+    script(src="../super-player.js")
+    for j in js 
+      script(src=j, type="text/javascript")
