@@ -22,6 +22,7 @@ let watch = (suffix, tasks) => {
 }
 
 gulp.task('pug', () => glue('pug'));
+gulp.task('md', () => glue('md'));
 
 gulp.task('ts', () => {
   let tsResult = tsProject.src()
@@ -62,7 +63,7 @@ gulp.task('build-player', done => {
 
 gulp.task('build-clients', done => runSequence('build-root', 'build-player', done));
 
-gulp.task('build', done => runSequence('clean', ['pug', 'ts', 'build-clients'], done));
+gulp.task('build', done => runSequence('clean', ['pug', 'md', 'ts', 'build-clients'], done));
 
 gulp.task('dev', ['build', 'watch-pug', 'watch-ts']);
 

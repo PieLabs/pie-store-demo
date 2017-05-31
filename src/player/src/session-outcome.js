@@ -3,7 +3,7 @@ import { applyStyle, prepareTemplate } from 'pie-catalog-client/src/styles';
 const html = `
   <style>
   :host {
-    display: block;
+    padding-top: 10px;
   } 
 
   .row {
@@ -35,8 +35,19 @@ export default class SessionOutcome extends HTMLElement {
   }
 
   set outcome(o) {
+    this._outcome = o;
+    if (o) {
+      this.removeAttribute('hidden');
+      this.style.display = 'block';
+    } else {
+      this.setAttribute('hidden', 'hidden');
+    }
+
     this._$percentage.textContent = `${o.summary.percentage}%`;
     this._$points.textContent = o.summary.score;
     this._$max.textContent = o.summary.max;
+  }
+  connectedCallback() {
+
   }
 }

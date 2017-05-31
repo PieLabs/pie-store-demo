@@ -1,6 +1,8 @@
 import { AjaxFailedEvent, AjaxResultEvent } from './ajax-link';
 import { applyStyle, prepareTemplate } from 'pie-catalog-client/src/styles';
 
+import dateformat from 'dateformat';
+
 const html = `
 <style>
 :host{
@@ -12,11 +14,31 @@ const html = `
   cursor: pointer;
   color: blue;
 }
+.action:hover{
+  text-decoration: underline;
+}
+
 table{
   width: 100%;
 }
+
 th{
   text-align: left;
+  background-color: var(--color-primary-light);
+}
+td, th{
+  padding: 10px;
+}
+tr{
+  transition: background-color linear 200ms;
+}
+
+tr:hover{
+  background-color: rgba(200,200,200,0.8);
+}
+
+tr.selected{
+  background-color: var(--color-primary);
 }
 </style>
 <table>
@@ -24,6 +46,9 @@ th{
     <tr>
     <th>student</th>
     <th>completed</th>
+    <th>score</th>
+    <th>date</th>
+    <th>duration</th>
     <th>actions</th>
   </tr>
   </thead>
@@ -45,10 +70,22 @@ export default class SessionListing extends HTMLElement {
     this.updateUi();
   }
 
-  actionClick(target) {
-    const sessionId = target.getAttribute('data-session-id');
+  actionClick(sessionId) {
     const session = this._sessions.find(s => s._id === sessionId);
+    this._activeSession = sessionId;
     this.dispatchEvent(new CustomEvent('show-session', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        session
+      }
+    }));
+    this.updateUi();
+  }
+
+  sudoClick(sessionId) {
+
+    this.dispatchEvent(new CustomEvent('launch-sudo-player', {
       bubbles: true,
       composed: true,
       detail: {
@@ -62,16 +99,32 @@ export default class SessionListing extends HTMLElement {
     tbody.innerHTML = '';
     this._sessions.forEach(s => {
       const tr = document.createElement('tr');
+      tr.setAttribute('class', s._id === this._activeSession ? 'selected' : '');
+      const started = s.started ? dateformat(new Date(s.started), 'yyyy/mm/dd HH:MM:ss') : null;
+      const completed = s.completed ? new Date(s.completed) : null;
+      const duration = (started && completed) ? ((completed.getTime() - new Date(s.started).getTime()) / 1000) : 'n/a';
+
       tr.innerHTML = `
       <td>${s.studentId}</td> 
       <td>${s.isComplete}</td>
-      <td><span class="action" data-session-id="${s._id}">show</a></td>`;
+      <td>${s.outcome ? `${s.outcome.summary.percentage}%` : ''}</td>
+      <td>${started || 'n/a'}</td>
+      <td>${duration !== 'n/a' ? `${duration} seconds` : 'n/a'}</td>
+      <td>
+      <span class="action" data-action="show" data-session-id="${s._id}">show</a>
+      <a href="/player/${s._id}/super-user" target="_blank">sudo</a>
+      </td>`;
       tbody.appendChild(tr);
     });
 
     tbody.querySelectorAll('.action').forEach(n => {
       n.addEventListener('click', e => {
-        this.actionClick(e.target);
+        const action = e.target.getAttribute('data-action');
+        const sessionId = e.target.getAttribute('data-session-id');
+        switch (action) {
+          case 'show': this.actionClick(sessionId);
+            break;
+        }
       });
     })
   }

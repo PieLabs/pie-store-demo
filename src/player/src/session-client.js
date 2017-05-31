@@ -50,4 +50,16 @@ export default class SessionClient {
       .then(json);
 
   }
+
+  sessionStarted() {
+    let { sessionStarted: { method, url } } = this.endpoints;
+    let opts = {
+      method,
+      headers
+    }
+
+    return fetch(url, opts)
+      .then(status)
+      .then(json);
+  }
 }

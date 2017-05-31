@@ -151,6 +151,17 @@ export default function mkApp<ID>(
       });
     });
 
+  app.put('/:sessionId/session-started', addSessionId,
+    (req: any, res, next) => {
+      sessionService.sessionStarted(req.sessionId)
+        .then(() => {
+          res.json({ success: true });
+        })
+        .catch(e => {
+          res.status(400).json({ success: false, message: e.message });
+        });
+    });
+
   app.get('/:sessionId',
     addSessionId,
     async (req: any, res, next) => {
@@ -159,6 +170,7 @@ export default function mkApp<ID>(
       logger.silly('query: ', req.query);
 
       const endpoints = {
+
         model: {
           method: 'POST',
           url: `${req.sessionId}/model`
@@ -166,6 +178,10 @@ export default function mkApp<ID>(
         outcome: {
           method: 'POST',
           url: `${req.sessionId}/outcome`
+        },
+        sessionStarted: {
+          method: 'PUT',
+          url: `${req.sessionId}/session-started`
         },
         submit: {
           method: 'PUT',

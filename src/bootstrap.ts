@@ -10,6 +10,7 @@ import {
 } from './services';
 
 import { ControllerCache } from './player/controller/cache';
+import PieController from "./player/controller/controller";
 import { S3 } from 'aws-sdk';
 import { buildLogger } from 'log-factory';
 import { join } from 'path';
@@ -34,16 +35,16 @@ export type BootstrapOpts = {
 
 export async function bootstrap(opts: BootstrapOpts): Promise<Services<ObjectID>> {
   const { s3, mongoUri } = opts;
-  const db = await MongoClient.connect(mongoUri);
-  const items: ItemService<ObjectID> = new MongoItemService(db.collection('items'));
-  const sessions: SessionService<ObjectID> = await MongoSessionService.build(db.collection('sessions'));
   const client = new S3();
-
+  const db = await MongoClient.connect(mongoUri);
   const file = (s3.bucket && s3.prefix) ?
     new S3Service(s3.bucket, s3.prefix, client) :
     new LocalFileService(join(process.cwd(), 'seed/dev/items'));
-
   const controllerCache = new ControllerCache(file);
+
+  const items: ItemService<ObjectID> = MongoItemService.build(db.collection('items'), controllerCache);
+  const sessions: SessionService<ObjectID> = await MongoSessionService.build(db.collection('sessions'), items);
+
   const users = await MongoUserService.build(db.collection('users'));
   return { items, sessions, file, controllerCache, users };
 }

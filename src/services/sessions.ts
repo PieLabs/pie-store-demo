@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 
 import { Collection, ObjectID } from 'mongodb';
 
+import { ItemService } from './items';
 import { SessionService } from './sessions';
 import { buildLogger } from 'log-factory';
 
@@ -15,20 +16,21 @@ export interface SessionService<ID> {
   delete(id: ID): Promise<boolean>;
   findById(id: ID): Promise<any>;
   submitAnswers(id: ID, answers: any[]): Promise<any>;
+  sessionStarted(id: ID): Promise<Date>;
 }
 
 export class MongoSessionService implements SessionService<ObjectID> {
 
-  public static build(collection: Collection): Promise<SessionService<ObjectID>> {
+  public static build(collection: Collection, itemService: ItemService<ObjectID>): Promise<SessionService<ObjectID>> {
     return (collection as any).ensureIndex({
       itemId: 1,
       studentId: 1
     },
       { unique: true }).then(() => {
-        return new MongoSessionService(collection);
+        return new MongoSessionService(collection, itemService);
       });
   }
-  private constructor(private collection: Collection) {
+  private constructor(private collection: Collection, private itemService: ItemService<ObjectID>) {
   }
 
   public listForItem(itemId: ObjectID): Promise<{}[]> {
@@ -98,19 +100,26 @@ export class MongoSessionService implements SessionService<ObjectID> {
     // const session = await this.collection.findOne({ _id, isComplete: false }, { fields: { itemId: 1 } });
     // this.itemService.outcome(session.itemId
     const query = { _id, isComplete: false };
-
+    const completed = new Date();
     return this.collection.findOneAndUpdate(
       query,
-      { $set: { answers, isComplete: true } },
+      { $set: { answers, isComplete: true, completed } },
       { upsert: false, returnOriginal: false })
       .then(async r => {
         logger.debug('[submitAnswers] db result: ', JSON.stringify(r));
         if (r.ok && r.value !== null) {
 
           const itemId = r.value.itemId;
-          // fire off a save outcome in the background
-          const outcome = this.itemService.outcome(itemId, r.value.answers);
-          this.collection.update(query, { $set: { outcome } });
+
+          // save outcome in the background
+          this.itemService.outcome(itemId, r.value.answers)
+            .then(outcome => {
+              logger.silly(`_id: ${_id}, got an outcome - saving to the session`);
+              logger.silly(`_id: ${_id}, outcome: ${outcome}`);
+              return this.collection.update({ _id, isComplete: true }, { $set: { outcome } }, { upsert: false });
+            })
+            .catch(e => logger.error(e));
+
           return r.value;
         } else {
           if (r.lastErrorObject && r.lastErrorObject.n === 0) {
@@ -122,6 +131,18 @@ export class MongoSessionService implements SessionService<ObjectID> {
             }
           }
         }
+      });
+
+  }
+  public sessionStarted(_id: ObjectID): Promise<Date> {
+    const started = new Date();
+    return this.collection.update(
+      { _id, isComplete: false, started: { $exists: false } },
+      { $set: { started } },
+      { upsert: false })
+      .then(r => {
+        logger.silly(`[sessionStarted]: dbResult: ${r}`);
+        return started;
       });
   }
 }

@@ -96,17 +96,17 @@ const init = () => {
       });
 
       document.addEventListener('player-controls.get-outcome', e => {
-        console.log('get outcome..');
         const { session, env } = store();
         player.outcomes(session, env)
           .then((outcomes) => {
-            console.log('outcomes: ', outcomes);
             sessionOutcome.outcome = outcomes;
             env.mode = 'evaluate';
             player.env(env);
           });
 
       });
+
+      client.sessionStarted();
 
     });
 }

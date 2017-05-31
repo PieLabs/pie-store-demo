@@ -14,6 +14,7 @@ const html = `
 
   session-listing{
     flex: 1;
+    padding-right: 10px;
   }
   ::slotted(session-preview){
     flex: 1;
