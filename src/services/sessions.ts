@@ -92,15 +92,25 @@ export class MongoSessionService implements SessionService<ObjectID> {
       .then(r => r.result.ok === true);
   }
 
-  public submitAnswers(_id: ObjectID, answers: any[]): Promise<any> {
+  public async submitAnswers(_id: ObjectID, answers: any[]): Promise<any> {
     logger.info('[submitAnswer] _id: ', _id, ' answers: ', answers);
+
+    // const session = await this.collection.findOne({ _id, isComplete: false }, { fields: { itemId: 1 } });
+    // this.itemService.outcome(session.itemId
+    const query = { _id, isComplete: false };
+
     return this.collection.findOneAndUpdate(
-      { _id, isComplete: false },
+      query,
       { $set: { answers, isComplete: true } },
       { upsert: false, returnOriginal: false })
       .then(async r => {
-        logger.debug('result: ', JSON.stringify(r));
+        logger.debug('[submitAnswers] db result: ', JSON.stringify(r));
         if (r.ok && r.value !== null) {
+
+          const itemId = r.value.itemId;
+          // fire off a save outcome in the background
+          const outcome = this.itemService.outcome(itemId, r.value.answers);
+          this.collection.update(query, { $set: { outcome } });
           return r.value;
         } else {
           if (r.lastErrorObject && r.lastErrorObject.n === 0) {
