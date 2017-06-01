@@ -36,16 +36,26 @@ export default class StudentIdForm extends HTMLElement {
     this._$name = sr.querySelector('#name');
   }
 
-  connectedCallback() {
-    this._$submit.addEventListener('click', e => {
+  dispatchSubmit() {
+    this.dispatchEvent(new CustomEvent('submit', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        name: this._$name.value
+      }
+    }));
+  }
 
-      this.dispatchEvent(new CustomEvent('submit', {
-        bubbles: true,
-        composed: true,
-        detail: {
-          name: this._$name.value
-        }
-      }))
+  connectedCallback() {
+
+    this._$name.addEventListener('keydown', e => {
+      if (e.keyCode === 13) {
+        this.dispatchSubmit();
+      }
+    });
+
+    this._$submit.addEventListener('click', e => {
+      this.dispatchSubmit();
     });
   }
 }

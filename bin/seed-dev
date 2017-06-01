@@ -136,7 +136,7 @@ Promise.all(builtItems)
       const collection = db.collection('items');
       return Promise.all(items.map(i => {
         i.username = 'ed';
-        i.name = 'this is an item name';
+        i.name = 'Scandinavian EU Countries';
         return collection.insert(i)
           .then(() => {
             console.log('inserted: ', i);
