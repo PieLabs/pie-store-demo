@@ -15,8 +15,8 @@
   },
   "repository": "PieLabs/pie-store-demo",
   "engines": {
-    "node": ">=7.2.0",
-    "npm": ">=3.10.7"
+    "node": "^7.10.0",
+    "npm": "^4.2.0"
   },
   "keywords": [
     "pie",
