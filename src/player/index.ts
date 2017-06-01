@@ -13,6 +13,7 @@ import { ControllerCache } from './controller/cache';
 import { FileService } from './file-service';
 import { buildControllerMap } from './vm';
 import { buildLogger } from 'log-factory';
+import { ensureLoggedIn } from 'connect-ensure-login';
 import { json } from 'body-parser';
 
 const logger = buildLogger();
@@ -99,6 +100,7 @@ export default function mkApp<ID>(
   });
 
   app.get('/:sessionId/super-user',
+    ensureLoggedIn('/login'),
     addSessionId,
     async (req: any, res, next) => {
       logger.silly('sessionId:', req.sessionId);

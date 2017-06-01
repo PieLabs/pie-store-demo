@@ -12,10 +12,18 @@ const html = `
     display: flex;
     justify-content: space-between;
   }
+  a {
+    color: white;
+    text-decoration: none;
+    transition: color 100ms linear;
+  }
+  a:hover{
+    color: var(--store-link-hover-color, green);
+  }
   
 </style>
 <centered-content>
-  <div class="brand">pie-store</div>
+  <div class="brand"><a href="/">pie-store</a></div>
   <a href="/logout">logout</a>
 </centered-content>
 `;

@@ -11,6 +11,10 @@ customElements.define('centered-content', CenteredContent);
 
 const init = () => {
   document.querySelector('item-list').items = window._pieStore.items;
+
+  document.querySelector('#create-new-item').addEventListener('click', e => {
+    window.alert('todo!');
+  });
 }
 
 if (document.readyState === 'ready') {

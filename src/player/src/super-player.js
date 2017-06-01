@@ -1,5 +1,7 @@
 require('../../client-common/common');
+require('./super-player.less');
 
+import CenteredContent from '../../root/src/centered-content';
 import CodeEditor from './code-editor';
 import ErrorLog from './error-log';
 import HPane from './h-pane';
@@ -8,6 +10,7 @@ import PieStoreController from './pie-store-controller';
 import PlayerControls from './player-controls';
 import SessionClient from './session-client';
 import SessionEditor from './session-editor';
+import StoreHeader from '../../root/src/store-header';
 import some from 'lodash/some';
 
 customElements.define('pie-player', PiePlayer);
@@ -16,6 +19,8 @@ customElements.define('h-pane', HPane);
 customElements.define('code-editor', CodeEditor);
 customElements.define('session-editor', SessionEditor);
 customElements.define('error-log', ErrorLog);
+customElements.define('store-header', StoreHeader);
+customElements.define('centered-content', CenteredContent);
 
 //TODO: Use a binding lib built w/ es6 proxies?
 
@@ -33,8 +38,6 @@ const init = () => {
 
   Promise.all(elements)
     .then(() => {
-      const container = document.querySelector('catalog-container');
-      container.isLoading(false);
 
       const { env, session, endpoints } = store();
       const sessionEditor = document.querySelector('session-editor');
