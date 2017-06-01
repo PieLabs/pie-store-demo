@@ -9,6 +9,11 @@ import { buildLogger } from 'log-factory';
 
 const logger = buildLogger();
 
+type CountResult<ID> = {
+  _id: ID,
+  count: number
+}
+
 export interface SessionService<ID> {
   listForItem(itemId: ID): Promise<any[]>;
   createForItem(itemId: ID, studentId: string): Promise<{}>;
@@ -17,6 +22,8 @@ export interface SessionService<ID> {
   findById(id: ID): Promise<any>;
   submitAnswers(id: ID, answers: any[]): Promise<any>;
   sessionStarted(id: ID): Promise<Date>;
+
+  counts(itemIds: ID[]): Promise<CountResult<ID>[]>;
 }
 
 export class MongoSessionService implements SessionService<ObjectID> {
@@ -144,5 +151,9 @@ export class MongoSessionService implements SessionService<ObjectID> {
         logger.silly(`[sessionStarted]: dbResult: ${r}`);
         return started;
       });
+  }
+
+  public async counts(ids: ObjectID[]): Promise<CountResult<ObjectID>[]> {
+    return null;
   }
 }

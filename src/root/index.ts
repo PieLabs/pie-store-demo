@@ -57,7 +57,8 @@ export default function <ID>(
       itemService.listForUsername(username)
         .then(items => {
           const cleaned = items.map((i: any) => ({
-            _id: i._id.toHexString()
+            _id: i._id.toHexString(),
+            name: i.name
           }));
           logger.silly('cleaned: ', cleaned);
           res.render('index', {
