@@ -53,7 +53,7 @@ export default class PieController {
 
   private callComponentController(fnName, session, env) {
 
-    logger.debug('session: ', JSON.stringify(session, null, '  '));
+    logger.silly('[callComponenentController] session: ', JSON.stringify(session, null, '  '));
 
     const toData = (model) => {
 
@@ -74,7 +74,7 @@ export default class PieController {
 
       const modelFn = this.controllerMap[data.element][fnName] || failed;
 
-      logger.debug('data: ', JSON.stringify(data, null, '  '));
+      logger.silly('[callComponentController] data: ', JSON.stringify(data, null, '  '));
       return modelFn(data.model, data.session, env)
         .then(result => {
           result.id = data.id;

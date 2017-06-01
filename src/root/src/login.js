@@ -1,12 +1,14 @@
+require('./login.less');
+
 require('../../client-common/common');
 
-console.log('login!');
-
-
+import LoginForm from './login-form';
+customElements.define('login-form', LoginForm);
 
 const init = () => {
-  const container = document.querySelector('catalog-container');
-  container.isLoading(false);
+  const loginForm = document.querySelector('login-form');
+  loginForm.method = 'post';
+  loginForm.action = '/login';
 }
 
 if (document.readyState === 'ready') {

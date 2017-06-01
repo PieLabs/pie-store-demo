@@ -1,0 +1,19 @@
+//palette
+@navy: #292C44;
+@peach: #FF5349;
+@grey: #F0F0F1;
+@cyan: #18CDCA;
+@chalkyBlue: #4F80E1;
+
+@colorPrimary:@chalkyBlue;
+@colorSecondary: @peach;
+@colorLight: lighten(@chalkyBlue, 30%);
+
+html {
+  //pass less vars into runtime css vars
+  --color-primary: @colorPrimary;
+  --color-secondary: @colorSecondary;
+  --color-light: lighten(@colorLight, 7%);
+  --max-width: 1200px;
+}
+

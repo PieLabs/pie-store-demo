@@ -19,10 +19,10 @@ html
        console.log('endpoints; ', window._pieStore.endpoints);
 
   body
-    catalog-container 
-      span(slot="header") Pie Demo Store
-      item-info
+    store-header
+    item-info
 
     script(src="/item.js")    
+    
     for j in js 
       script(src=j, type="text/javascript")

@@ -1,12 +1,15 @@
 require('../../client-common/common');
+require('./index.less');
 
+import CenteredContent from './centered-content';
 import ItemList from './item-list';
+import StoreHeader from './store-header';
 
 customElements.define('item-list', ItemList);
+customElements.define('store-header', StoreHeader);
+customElements.define('centered-content', CenteredContent);
 
 const init = () => {
-  const container = document.querySelector('catalog-container');
-  container.isLoading(false);
   document.querySelector('item-list').items = window._pieStore.items;
 }
 
