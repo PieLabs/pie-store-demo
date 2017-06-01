@@ -56,10 +56,6 @@ export default function <ID>(
       logger.debug('username: ', username);
       itemService.listForUsername(username)
         .then(items => {
-          // const cleaned = items.map((i: any) => ({
-          //   _id: i._id.toHexString(),
-          //   name: i.name
-          // }));
           logger.silly('cleaned: ', items);
           res.render('index', { items });
         })
@@ -78,7 +74,8 @@ export default function <ID>(
   });
 
   app.get('/login', (req, res, next) => {
-    res.render('login', { error: req.flash('loginError') });
+    const error = req.flash('loginError');
+    res.render('login', { error: error[0] })
   });
 
   app.post('/login',

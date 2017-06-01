@@ -22,8 +22,8 @@ const argv = minimist(process.argv.slice(2));
 
 const raw = process.argv.slice(2);
 const args: any = minimist(raw);
-const logConfig = process.env.LOG_CONFIG || args.logConfig || 'info';
 const env = process.env.NODE_ENV || args.env || 'prod';
+const logConfig = process.env.LOG_CONFIG || args.logConfig || env === 'prod' ? 'warn' : 'info';
 
 // tslint:disable-next-line:no-var-requires
 const flash = require('connect-flash');
