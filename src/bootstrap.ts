@@ -42,8 +42,11 @@ export async function bootstrap(opts: BootstrapOpts): Promise<Services<ObjectID>
     new LocalFileService(join(process.cwd(), 'seed/dev/items'));
   const controllerCache = new ControllerCache(file);
 
-  const items: ItemService<ObjectID> = MongoItemService.build(db.collection('items'), controllerCache);
-  const sessions: SessionService<ObjectID> = await MongoSessionService.build(db.collection('sessions'), items);
+  let sessions: SessionService<ObjectID> = null;
+
+  const items: ItemService<ObjectID> = MongoItemService.build(db.collection('items'), controllerCache, () => sessions);
+
+  sessions = await MongoSessionService.build(db.collection('sessions'), items);
 
   const users = await MongoUserService.build(db.collection('users'));
   return { items, sessions, file, controllerCache, users };

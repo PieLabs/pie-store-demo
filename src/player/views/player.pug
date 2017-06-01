@@ -22,14 +22,10 @@ html
        window._pieStore.endpoints = !{ endpoints ? JSON.stringify(endpoints) : {}};
 
   body
-    catalog-container 
-      span(slot="header") Player 
-      h-pane     
-        div 
-          pie-player
-            | !{markup}  
-          simple-player-controls
-          session-outcome(hidden)
+    pie-player
+      | !{markup}  
+    simple-player-controls
+    session-outcome(hidden)
 
     script(src="player.js")
     

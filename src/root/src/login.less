@@ -1,28 +1,13 @@
-//palette
-@navy: #292C44;
-@peach: #FF5349;
-@grey: #F0F0F1;
-@cyan: #18CDCA;
-@chalkyBlue: #4F80E1;
+@import "palette.less";
 
-@colorPrimary:@chalkyBlue;
-@colorSecondary: @peach;
-@colorLight: lighten(@chalkyBlue, 30%);
 
-.vertical-gradient(@from-color: rgba(0,0,0,1); @from-alpha : 0%){
-  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&1+0,0+100 */
-  background: -moz-linear-gradient(top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(top, rgba(0,0,0,1) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to bottom, @from-color @from-alpha,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
-}
 
 html {
   //pass less vars into runtime css vars
   --color-primary: @colorPrimary;
   --color-secondary: @colorSecondary;
   --color-light: @colorLight;
-  background-color: var(--color-light);
+  background-color: var(--color-light); 
 }
 
 body{
@@ -30,7 +15,6 @@ body{
 }
 
 .root {
-  .vertical-gradient(@from-color: rgba(0,0,0,0.3));
   display: flex;
   flex-direction: column;
   justify-content: center;

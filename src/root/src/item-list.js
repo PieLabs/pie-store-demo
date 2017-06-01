@@ -3,8 +3,26 @@ import { applyStyle, prepareTemplate } from 'pie-catalog-client/src/styles';
 const html = `
 <style>
 :host {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+table{
+  width: 100%;
+}
+
+th{
+  text-align: left;
+  background-color: var(--item-list-th-bg-color, black);
+  color: var(--item-list-th-color, red);
   padding: 10px;
 }
+
+td{
+  padding: 10px;
+}
+
 </style>
 <table>
   <thead>
@@ -36,7 +54,7 @@ export default class ItemList extends HTMLElement {
     (this._items || []).forEach(i => {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${i.name}</td>
-      <td>no of sessions</td>
+      <td>${i.sessionCount}</td>
       <td> 
       <a href="/items/${i._id}">view</a>
       </td>`;

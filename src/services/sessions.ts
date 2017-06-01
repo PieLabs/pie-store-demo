@@ -153,7 +153,29 @@ export class MongoSessionService implements SessionService<ObjectID> {
       });
   }
 
-  public async counts(ids: ObjectID[]): Promise<CountResult<ObjectID>[]> {
-    return null;
+  public counts(ids: ObjectID[]): Promise<CountResult<ObjectID>[]> {
+
+    return new Promise((resolve, reject) => {
+      this.collection.aggregate([
+        { $match: { itemId: { $in: ids } } },
+        {
+          $group: {
+            _id: '$itemId',
+            count: { $sum: 1 }
+          }
+        }
+      ], (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          logger.silly('result: ', result);
+
+          const out = result.map(r => {
+            return { _id: r._id, count: r.count };
+          });
+          return resolve(out);
+        }
+      });
+    });
   }
 }

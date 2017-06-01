@@ -41,11 +41,18 @@ export class MongoItemService implements ItemService<ObjectID> {
 
   public async listForUsername(username: string, skip: number = 0, limit: number = 0) {
     const list = await this.list({ username }, { _id: 1, name: 1 }, skip, limit);
-    const counts = this.sessionService().counts(list.map((l: any) => l._id));
+    const counts = await this.sessionService().counts(list.map((l: any) => l._id));
+
+    logger.silly('[listForUsername] counts: ', JSON.stringify(counts, null, '  '));
     const out = list.map((l: any) => {
-      const countResult = counts.find(c => c._id === l._id);
-      return { _id: l._id, name: l.name, sessionCount: countResult.count }
+      const countResult = counts.find(c => c._id.equals(l._id));
+      return {
+        _id: l._id,
+        name: l.name,
+        sessionCount: countResult ? countResult.count : -1
+      };
     });
+    logger.silly('[listForUsername] out: ', JSON.stringify(out, null, '  '));
     return out;
   }
 

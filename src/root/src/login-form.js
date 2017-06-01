@@ -4,11 +4,8 @@ const html = `
 <style>
 :host {
   display: block;
-  --material-input-placeholder-color: var(--color-primary);
-  --material-input-border-color: var(--color-secondary);
-  --material-input-highlight-color: var(--color-secondary);
-  --material-input-valid-color: var(--color-primary);
 }
+
 input{
   margin: 10px;
 }

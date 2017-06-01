@@ -1,4 +1,5 @@
 require('../../client-common/common');
+require('./player.less');
 
 import HPane from './h-pane';
 import PiePlayer from 'pie-player';
@@ -27,8 +28,6 @@ const init = () => {
 
   Promise.all(elements)
     .then(() => {
-      const container = document.querySelector('catalog-container');
-      container.isLoading(false);
 
       const { env, session, endpoints } = store();
       const player = document.querySelector('pie-player');

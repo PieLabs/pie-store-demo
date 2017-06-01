@@ -1,4 +1,5 @@
 require('../../client-common/common');
+require('./partake.less');
 
 import {
   jsonHeaders as headers,
@@ -11,8 +12,6 @@ import StudentIdForm from './student-id-form';
 customElements.define('student-id-form', StudentIdForm);
 
 const init = () => {
-  const container = document.querySelector('catalog-container');
-  container.isLoading(false);
 
   customElements.whenDefined('student-id-form')
     .then(() => {

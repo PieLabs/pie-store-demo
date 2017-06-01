@@ -27,7 +27,11 @@ th{
   background-color: var(--color-primary-light);
 }
 td, th{
-  padding: 10px;
+  padding: 10px 10px 10px 0;
+}
+
+th {
+  border-bottom: solid 1px var(--session-listing-th-border-color, red);
 }
 tr{
   transition: background-color linear 200ms;
@@ -67,7 +71,9 @@ export default class SessionListing extends HTMLElement {
 
   set sessions(s) {
     this._sessions = s;
-    this.updateUi();
+    if (this._sessions && this._sessions.length > 0) {
+      this.actionClick(this._sessions[0]._id);
+    }
   }
 
   actionClick(sessionId) {

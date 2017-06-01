@@ -56,14 +56,12 @@ export default function <ID>(
       logger.debug('username: ', username);
       itemService.listForUsername(username)
         .then(items => {
-          const cleaned = items.map((i: any) => ({
-            _id: i._id.toHexString(),
-            name: i.name
-          }));
-          logger.silly('cleaned: ', cleaned);
-          res.render('index', {
-            items: cleaned
-          });
+          // const cleaned = items.map((i: any) => ({
+          //   _id: i._id.toHexString(),
+          //   name: i.name
+          // }));
+          logger.silly('cleaned: ', items);
+          res.render('index', { items });
         })
         .catch(next);
     });

@@ -14,8 +14,8 @@ html
        window._pieStore.endpoints = !{ endpoints ? JSON.stringify(endpoints) : '{}'};
 
   body
-    catalog-container
-      span(slot="header") Pie Demo Store 
-      student-id-form
+    .root 
+      .form
+        student-id-form
     
     script(src="../partake.js")

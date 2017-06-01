@@ -10,6 +10,7 @@ const html = `
   .main {
     display: flex;
     width: 100%;
+    padding-top: 10px;
   }
 
   session-listing{
@@ -19,14 +20,26 @@ const html = `
   ::slotted(session-preview){
     flex: 1;
   }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: solid 1px var(--item-info-header-border-color);
+    padding: 10px 0 10px 0;
+  }
+  .name{
+    font-size: 28px;
+  }
 </style>
-<div class="main">
-<session-listing></session-listing>
-<slot>
-</slot>
+<div class="header">
+  <div class="name"></div>
+  <div class="actions"> </div>
 </div>
-<div class="actions">
-</div>`;
+<div class="main">
+  <session-listing></session-listing>
+  <slot> </slot>
+</div>
+`;
 
 const template = prepareTemplate(html, 'item-info');
 
@@ -44,6 +57,8 @@ export default class ItemInfo extends HTMLElement {
     this._$sessionListing.addEventListener('show-session', e => {
       this._$sessionPreview.showSession(e.detail.session);
     });
+
+    this._$name = sr.querySelector('.name');
   }
 
   set item(i) {
@@ -58,9 +73,8 @@ export default class ItemInfo extends HTMLElement {
     this._render();
   }
 
-
-
   _render() {
+    this._$name.textContent = this._item.name;
     this._renderSessions();
     this._renderEndpoints();
   }
