@@ -60,7 +60,21 @@ node lib/index.js #add params here or have the env vars set.
 |`--bucket` | `S3_BUCKET` | pie-store-demo  | the s3 bucket |
 |`--prefix` | `S3_PREFIX` | test  | the prefix within the bucket |
 
- 
+
+
+## deployment
+
+* needs [cs-builder-two](https://github.com/corespring-cs-builder#cs-builder-two)
+
+```bash
+npm run build
+bin/seed-dev --bucket pie-store-demo --prefix test --uri mongodb://XXXX:XXXX@ds151820.mlab.com:51820/pie-store-demo
+# you'll need to export the auth token for owner of the app you're targeting
+export HEROKU_AUTH_TOKEN=XXXXXXXXX
+./deploy.sh pie-store-demo
+
+```
+
 
 ## todos
 
